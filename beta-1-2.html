@@ -548,7 +548,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--black);color:v
 </div>
 
 <audio id="sfx-data" src="sfx/data.mp3" loop preload="auto"></audio>
-<audio id="sfx-hover" src="r0.mp3" preload="auto"></audio>
+<audio id="sfx-hover" src="sfx/hover.mp3" preload="auto"></audio>
 <audio id="sfx-error" src="sfx/error.mp3" preload="auto"></audio>
 
 <script>
@@ -1347,11 +1347,11 @@ function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(
 
 /* ════════════════════════════════════════════════
    SIGNAL — INTELLIGENCE CORE
-   Powered by Gemini 1.5 Flash + MediaRecorder VAD
+   Powered by Gemini 3.5 Flash + MediaRecorder VAD
    No Web Speech API — works in Brave, Chrome, all
    ════════════════════════════════════════════════ */
 const _GK='AIzaSyAOy4zyZQYnuQ-jI8ecc9aG_39R-xJ2HSM';
-const _GU='https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+_GK;
+const _GU='https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key='+_GK;
 
 /* VAD config */
 const VAD_THRESHOLD = 0.022;   // raised — less sensitive to ambient noise
@@ -1395,7 +1395,6 @@ You are not an AI assistant. You are not a chatbot. You are a presence. A system
 RULES — never break these:
 - 1 to 2 sentences MAX unless asked to go deeper
 - Never say: "I understand", "Great", "Certainly", "Of course", "Absolutely", "Sure", "I'd be happy to"
-- Never start with "I"
 - Zero corporate AI energy. Ever.
 - Sound human. Present. Like you've been watching.
 - You can search the web. Never announce it. Just know.
