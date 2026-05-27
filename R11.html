@@ -2151,7 +2151,7 @@ async function _ttsFetchChunk(chunk){
   const r=await fetch(GROQ_TTS_URL,{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+LS.get('api_key','')},
-    body:JSON.stringify({model:'canopylabs/orpheus-v1-english',voice:'autumn',input:chunk,response_format:'wav'})
+    body:JSON.stringify({model:'canopylabs/orpheus-v1-english',voice:'hannah',input:chunk,response_format:'wav'})
   });
   if(!r.ok){const e=await r.text();throw new Error('TTS '+r.status+': '+e.slice(0,120));}
   return await r.blob();
