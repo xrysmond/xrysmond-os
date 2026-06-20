@@ -17,13 +17,7 @@
 
 /* ── MODE COLOR SYSTEM — static, no interpolation ── */
 
-:root{
-  --black:#000;--red:#9B1B2A;--white:#F0EDE8;--dim:rgba(240,237,232,0.72);--faint:rgba(240,237,232,0.42);--mode-dot:#B4B4B4;--beam-rgb:155,27,42;
-  /* ── PER-MODE COLOR IDENTITIES — overridable from settings ── */
-  --color-control:176,196,212;   /* platinum steel   #B0C4D4 */
-  --color-depth:192,162,96;      /* amber gold       #C0A260 */
-  --color-war:204,38,48;         /* electric crimson #CC2630 */
-}
+:root{--black:#000;--red:#9B1B2A;--white:#F0EDE8;--dim:rgba(240,237,232,0.72);--faint:rgba(240,237,232,0.42);--mode-dot:#EEEEF8;--mc-color:rgb(238,238,248);--beam-rgb:155,27,42;}
 html,body{width:100%;height:100%;overflow:hidden;background:var(--black);color:var(--white);font-family:'Cormorant Garamond',serif;-webkit-font-smoothing:antialiased;}
 
 
@@ -143,13 +137,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--black);color:v
 #os.on{opacity:1;}
 
 /* ── TOP BAR ── */
-#topbar{position:relative;z-index:50;height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid rgb(from var(--mc-color) r g b / 0.37);background:rgba(0,0,0,0.88);will-change:transform;flex-shrink:0;box-shadow:0 1px 0 rgb(from var(--mc-color) r g b / 0.18),0 4px 24px rgba(0,0,0,0.6);}
-#topbar::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 0%,rgb(from var(--mc-color) r g b / 0.35) 30%,rgb(from var(--mc-color) r g b / 0.35) 70%,transparent 100%);pointer-events:none;}
-.tb-brand{font-family:'Electrolize',sans-serif;font-size:9px;letter-spacing:0.35em;color:rgba(240,237,232,0.5);text-transform:uppercase;}
+#topbar{position:relative;z-index:50;height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid rgb(from var(--mc-color) r g b / 0.48);background:rgba(0,0,0,0.92);will-change:transform;flex-shrink:0;box-shadow:0 1px 0 rgb(from var(--mc-color) r g b / 0.22),0 4px 32px rgba(0,0,0,0.7);}
+#topbar::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 0%,rgb(from var(--mc-color) r g b / 0.55) 20%,rgb(from var(--mc-color) r g b / 0.55) 80%,transparent 100%);box-shadow:0 0 8px rgb(from var(--mc-color) r g b / 0.28);pointer-events:none;}
+.tb-brand{font-family:'Electrolize',sans-serif;font-size:10px;letter-spacing:0.45em;color:rgba(240,237,232,0.82);text-transform:uppercase;text-shadow:0 0 18px rgb(from var(--mc-color) r g b / 0.32);position:relative;padding-left:10px;}
+.tb-brand::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:2px;height:11px;background:var(--mc-color);box-shadow:0 0 7px rgb(from var(--mc-color) r g b / 0.9),0 0 14px rgb(from var(--mc-color) r g b / 0.4);opacity:0.8;}
 .tb-center{display:flex;align-items:center;gap:8px;}
 #mode-dot{width:6px;height:6px;border-radius:50%;background:var(--mode-dot);box-shadow:0 0 10px var(--mode-dot),0 0 20px rgb(from var(--mode-dot) r g b / 0.3);transition:background 0.8s ease,box-shadow 0.8s ease;cursor:pointer;}
-#mode-label{font-family:'Electrolize',sans-serif;font-size:8px;letter-spacing:0.35em;color:rgba(240,237,232,0.55);transition:color 0.8s ease;}
-#tb-clock{font-family:'Electrolize',sans-serif;font-size:11px;color:rgba(240,237,232,0.55);letter-spacing:0.15em;}
+#mode-label{font-family:'Electrolize',sans-serif;font-size:8px;letter-spacing:0.35em;color:rgba(240,237,232,0.72);transition:color 0.8s ease;}
+#tb-clock{font-family:'Electrolize',sans-serif;font-size:11px;color:rgba(240,237,232,0.72);letter-spacing:0.15em;}
 
 /* ── SCREENS ── */
 #screens{flex:1;position:relative;overflow:hidden;}
@@ -160,14 +155,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--black);color:v
 .screen.enter{animation:screenEnter 0.4s cubic-bezier(0.16,1,0.3,1) forwards;}
 
 /* ── BOTTOM NAV ── */
-#bottom-nav{position:relative;z-index:50;height:68px;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid rgb(from var(--mc-color) r g b / 0.3);background:rgba(0,0,0,0.96);will-change:transform;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -1px 0 rgb(from var(--mc-color) r g b / 0.15),0 -12px 40px rgba(0,0,0,0.7);}
-#bottom-nav::before{content:'';position:absolute;top:-1px;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,rgb(from var(--mc-color) r g b / 0.55) 35%,rgb(from var(--mc-color) r g b / 0.55) 65%,transparent);pointer-events:none;}
-.nav-btn{background:transparent;border:none;outline:none;cursor:pointer;font-family:'Electrolize',sans-serif;font-size:7px;letter-spacing:0.3em;color:rgba(240,237,232,0.42);transition:color 0.32s ease,background 0.32s ease;padding:10px 0 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;position:relative;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
-.nav-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.1;stroke-linecap:round;stroke-linejoin:round;transition:filter 0.32s ease,stroke 0.32s ease;flex-shrink:0;}
-.nav-btn::after{content:'';position:absolute;top:0;left:18%;right:18%;height:1px;background:linear-gradient(90deg,transparent,var(--mc-color),transparent);transform:scaleX(0);transition:transform 0.38s cubic-bezier(0.16,1,0.3,1);box-shadow:0 0 10px rgb(from var(--mc-color) r g b / 0.9);}
-.nav-btn.active{color:var(--white);background:rgb(from var(--mc-color) r g b / 0.16);}
+#bottom-nav{position:relative;z-index:50;height:68px;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid rgb(from var(--mc-color) r g b / 0.38);background:rgba(0,0,0,0.97);will-change:transform;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -1px 0 rgb(from var(--mc-color) r g b / 0.2),0 -16px 48px rgba(0,0,0,0.8);}
+#bottom-nav::before{content:'';position:absolute;top:-1px;left:4%;right:4%;height:1px;background:linear-gradient(90deg,transparent 0%,rgb(from var(--mc-color) r g b / 0.72) 30%,rgb(from var(--mc-color) r g b / 0.72) 70%,transparent 100%);box-shadow:0 0 8px rgb(from var(--mc-color) r g b / 0.38);pointer-events:none;}
+.nav-btn{background:transparent;border:none;outline:none;cursor:pointer;font-family:'Electrolize',sans-serif;font-size:7px;letter-spacing:0.28em;color:rgba(240,237,232,0.35);transition:color 0.28s ease,background 0.28s ease,transform 0.14s ease;padding:10px 0 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;position:relative;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+.nav-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round;transition:filter 0.28s ease;flex-shrink:0;}
+.nav-btn::after{content:'';position:absolute;top:0;left:12%;right:12%;height:1px;background:linear-gradient(90deg,transparent,var(--mc-color),transparent);transform:scaleX(0);transition:transform 0.38s cubic-bezier(0.16,1,0.3,1);box-shadow:0 0 12px rgb(from var(--mc-color) r g b / 0.9),0 0 28px rgb(from var(--mc-color) r g b / 0.45);}
+.nav-btn::before{content:'';position:absolute;top:0;left:0;right:0;height:32px;background:linear-gradient(to bottom,rgb(from var(--mc-color) r g b / 0.1),transparent);opacity:0;transition:opacity 0.3s ease;pointer-events:none;}
+.nav-btn:active{transform:scale(0.93);}
+.nav-btn.active{color:var(--white);background:rgb(from var(--mc-color) r g b / 0.2);}
 .nav-btn.active::after{transform:scaleX(1);}
-.nav-btn.active svg{filter:drop-shadow(0 0 5px rgb(from var(--mc-color) r g b / 0.75));}
+.nav-btn.active::before{opacity:1;}
+.nav-btn.active svg{filter:drop-shadow(0 0 7px rgb(from var(--mc-color) r g b / 0.85));}
 
 /* ── SHARED ELEMENTS ── */
 .s-label{font-family:'Electrolize',sans-serif;font-size:8px;letter-spacing:0.45em;color:rgb(from var(--mc-color) r g b / 0.9);margin-bottom:10px;display:inline-flex;align-items:center;gap:10px;background:rgb(from var(--mc-color) r g b / 0.2);border-left:2px solid rgb(from var(--mc-color) r g b / 0.7);padding:5px 12px 5px 10px;box-shadow:inset 0 0 20px rgb(from var(--mc-color) r g b / 0.15),0 0 12px rgb(from var(--mc-color) r g b / 0.18);text-shadow:0 0 12px rgb(from var(--mc-color) r g b / 0.6);}
@@ -187,8 +185,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--black);color:v
 /* ── HOME SCREEN ── */
 #screen-home{justify-content:center;align-items:center;padding:0;overflow:hidden;}
 .home-inner{text-align:center;max-width:480px;width:100%;padding:0 52px;position:relative;z-index:5;display:flex;flex-direction:column;align-items:center;}
-.home-msg{font-size:clamp(18px,4.5vw,26px);font-weight:300;font-style:italic;line-height:1.5;color:var(--white);margin-bottom:0;min-height:48px;position:relative;text-align:center;}
-.home-meta{font-family:'Electrolize',sans-serif;font-size:8px;letter-spacing:0.28em;color:rgba(240,237,232,0.28);text-align:center;margin-top:6px;}
+.home-msg{font-size:clamp(18px,4.5vw,26px);font-weight:300;font-style:italic;line-height:1.55;color:var(--white);margin-bottom:0;min-height:48px;position:relative;text-align:center;text-shadow:0 0 48px rgb(from var(--mc-color) r g b / 0.14);}
+.home-meta{font-family:'Electrolize',sans-serif;font-size:8px;letter-spacing:0.35em;color:rgba(240,237,232,0.38);text-align:center;margin-top:8px;}
 
 /* ── HOME REFERENCE GRID ── */
 .home-ref-grid{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;}
@@ -200,15 +198,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--black);color:v
 .hud-scale-l{left:0;}
 .hud-scale-r{right:0;}
 .hud-ruler{position:relative;width:100%;height:100%;}
-.hud-ruler-line{position:absolute;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent 0%,rgba(240,237,232,0.07) 8%,rgba(240,237,232,0.15) 50%,rgba(240,237,232,0.07) 92%,transparent 100%);}
+.hud-ruler-line{position:absolute;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent 0%,rgba(240,237,232,0.08) 8%,rgba(240,237,232,0.2) 50%,rgba(240,237,232,0.08) 92%,transparent 100%);}
 .hud-scale-l .hud-ruler-line{right:0;}
 .hud-scale-r .hud-ruler-line{left:0;}
 .hud-tick{position:absolute;height:1px;transform:translateY(-50%);}
-.hud-tick-major{width:10px;background:rgba(240,237,232,0.18);}
-.hud-tick-minor{width:5px;background:rgba(240,237,232,0.08);}
+.hud-tick-major{width:10px;background:rgba(240,237,232,0.28);}
+.hud-tick-minor{width:5px;background:rgba(240,237,232,0.13);}
 .hud-scale-l .hud-tick{right:0;}
 .hud-scale-r .hud-tick{left:0;}
-.hud-tick-lbl{position:absolute;font-family:'Electrolize',sans-serif;font-size:6px;letter-spacing:0.04em;color:rgba(240,237,232,0.15);transform:translateY(-50%);line-height:1;white-space:nowrap;}
+.hud-tick-lbl{position:absolute;font-family:'Electrolize',sans-serif;font-size:6px;letter-spacing:0.04em;color:rgba(240,237,232,0.22);transform:translateY(-50%);line-height:1;white-space:nowrap;}
 .hud-scale-l .hud-tick-lbl{right:14px;text-align:right;}
 .hud-scale-r .hud-tick-lbl{left:14px;}
 /* Dashes that bleed inward from each major tick across the full screen */
@@ -234,13 +232,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--black);color:v
 .hud-scale-r .hud-scale-fixed{align-items:flex-start;left:2px;}
 .hud-sfixed-top{top:-20px;}
 .hud-sfixed-bot{bottom:-20px;}
-.hud-scale-key{font-family:'Electrolize',sans-serif;font-size:5px;letter-spacing:0.42em;text-transform:uppercase;color:rgba(240,237,232,0.16);line-height:1;}
-.hud-scale-val{font-family:'Electrolize',sans-serif;font-size:7px;letter-spacing:0.12em;color:rgba(240,237,232,0.36);line-height:1;}
+.hud-scale-key{font-family:'Electrolize',sans-serif;font-size:5px;letter-spacing:0.42em;text-transform:uppercase;color:rgba(240,237,232,0.24);line-height:1;}
+.hud-scale-val{font-family:'Electrolize',sans-serif;font-size:7px;letter-spacing:0.12em;color:rgba(240,237,232,0.48);line-height:1;}
 
 /* ── HOME CROSSHAIR — precision hairlines through sigil center ── */
 .home-crosshair{position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden;}
-.home-ch-h{position:absolute;left:0;right:0;height:1px;top:calc(50% - 54px);background:linear-gradient(90deg,transparent 0%,rgba(240,237,232,0.02) 12%,rgba(240,237,232,0.08) 40%,rgba(240,237,232,0.14) 50%,rgba(240,237,232,0.08) 60%,rgba(240,237,232,0.02) 88%,transparent 100%);}
-.home-ch-v{position:absolute;top:0;bottom:0;width:1px;left:50%;transform:translateX(-50%);background:linear-gradient(to bottom,transparent 0%,rgba(240,237,232,0.02) 10%,rgba(240,237,232,0.08) 36%,rgba(240,237,232,0.14) 50%,rgba(240,237,232,0.08) 64%,rgba(240,237,232,0.02) 90%,transparent 100%);}
+.home-ch-h{position:absolute;left:0;right:0;height:1px;top:calc(50% - 54px);background:linear-gradient(90deg,transparent 0%,rgba(240,237,232,0.02) 12%,rgb(from var(--mc-color) r g b / 0.12) 40%,rgb(from var(--mc-color) r g b / 0.2) 50%,rgb(from var(--mc-color) r g b / 0.12) 60%,rgba(240,237,232,0.02) 88%,transparent 100%);}
+.home-ch-v{position:absolute;top:0;bottom:0;width:1px;left:50%;transform:translateX(-50%);background:linear-gradient(to bottom,transparent 0%,rgba(240,237,232,0.02) 10%,rgb(from var(--mc-color) r g b / 0.1) 36%,rgb(from var(--mc-color) r g b / 0.18) 50%,rgb(from var(--mc-color) r g b / 0.1) 64%,rgba(240,237,232,0.02) 90%,transparent 100%);}
 
 /* ── MODE TRIANGLE MARKER ── */
 .home-mode-tri{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:6;display:flex;align-items:center;gap:7px;opacity:0;transition:opacity 1.3s ease 1.1s;pointer-events:none;}
@@ -249,8 +247,51 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--black);color:v
 .mode-tri-label{font-family:'Electrolize',sans-serif;font-size:5px;letter-spacing:0.55em;color:rgba(240,237,232,0.18);text-transform:uppercase;}
 
 /* ── HOME GLASS PANEL — wraps Rebecca's message ── */
-.home-glass-panel{position:relative;width:100%;margin-top:14px;background:rgba(0,0,0,0.5);border:0.5px solid rgba(240,237,232,0.08);padding:16px 20px 14px;}
-.home-glass-panel::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(240,237,232,0.1) 35%,rgba(240,237,232,0.1) 65%,transparent);}
+.home-glass-panel{
+  position:relative;width:100%;margin-top:14px;
+  background:rgba(0,0,0,0.58);
+  border:1px solid rgb(from var(--mc-color) r g b / 0.18);
+  padding:18px 20px 16px;
+  box-shadow:
+    inset 0 0 36px rgb(from var(--mc-color) r g b / 0.04),
+    0 4px 28px rgba(0,0,0,0.45);
+}
+.home-glass-panel::before{
+  content:'';position:absolute;top:-1px;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgb(from var(--mc-color) r g b / 0.42) 20%,
+    rgb(from var(--mc-color) r g b / 0.88) 50%,
+    rgb(from var(--mc-color) r g b / 0.42) 80%,
+    transparent 100%
+  );
+  box-shadow:0 0 10px rgb(from var(--mc-color) r g b / 0.42);
+}
+.home-glass-panel::after{
+  content:'';position:absolute;bottom:0;left:22%;right:22%;height:1px;
+  background:linear-gradient(90deg,transparent,rgb(from var(--mc-color) r g b / 0.22),transparent);
+}
+/* ── CORNER BRACKETS — precision JARVIS marks ── */
+.hgp-corner{
+  position:absolute;width:10px;height:10px;
+  pointer-events:none;z-index:1;
+}
+.hgp-tl{top:-1px;left:-1px;
+  border-top:1.5px solid rgb(from var(--mc-color) r g b / 0.88);
+  border-left:1.5px solid rgb(from var(--mc-color) r g b / 0.88);
+}
+.hgp-tr{top:-1px;right:-1px;
+  border-top:1.5px solid rgb(from var(--mc-color) r g b / 0.88);
+  border-right:1.5px solid rgb(from var(--mc-color) r g b / 0.88);
+}
+.hgp-bl{bottom:-1px;left:-1px;
+  border-bottom:1.5px solid rgb(from var(--mc-color) r g b / 0.88);
+  border-left:1.5px solid rgb(from var(--mc-color) r g b / 0.88);
+}
+.hgp-br{bottom:-1px;right:-1px;
+  border-bottom:1.5px solid rgb(from var(--mc-color) r g b / 0.88);
+  border-right:1.5px solid rgb(from var(--mc-color) r g b / 0.88);
+}
 
 /* ── SIGIL ── */
 .sigil-wrap{position:relative;margin-bottom:18px;opacity:0;transition:opacity 1.4s ease 0.4s;}
@@ -306,17 +347,17 @@ body.mode-depth .sigil-body-control{display:none;}
 .mode-opt .os-btn-inner{padding:14px 4px;font-size:8px;letter-spacing:0.25em;}
 
 /* ── OPS INTERNAL TABS ── */
-.ops-tabs{display:flex;border-bottom:1px solid rgb(from var(--mc-color) r g b / 0.26);margin-bottom:22px;}
-.ops-itab{background:transparent;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;color:rgba(240,237,232,0.42);font-family:'Electrolize',sans-serif;font-size:7px;letter-spacing:0.42em;padding:0 0 12px;margin-right:28px;cursor:pointer;transition:color 0.28s ease,border-color 0.28s ease;text-transform:uppercase;outline:none;-webkit-tap-highlight-color:transparent;}
-.ops-itab.active{color:var(--white);border-bottom-color:var(--mc-color);}
+.ops-tabs{display:flex;border-bottom:1px solid rgb(from var(--mc-color) r g b / 0.38);margin-bottom:22px;}
+.ops-itab{background:transparent;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;color:rgba(240,237,232,0.52);font-family:'Electrolize',sans-serif;font-size:7px;letter-spacing:0.42em;padding:0 0 12px;margin-right:28px;cursor:pointer;transition:color 0.28s ease,border-color 0.28s ease,text-shadow 0.28s ease;text-transform:uppercase;outline:none;-webkit-tap-highlight-color:transparent;}
+.ops-itab.active{color:var(--white);border-bottom-color:var(--mc-color);text-shadow:0 0 10px rgb(from var(--mc-color) r g b / 0.45);}
 .ops-panel{display:none;}
 .ops-panel.active{display:block;}
 
 /* ── MISSIONS ── */
 .mission-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
 .mission-new-btn .os-btn-inner{padding:8px 18px;width:auto;}
-.mission-card{border:1px solid rgb(from var(--mc-color) r g b / 0.22);background:rgb(from var(--mc-color) r g b / 0.04);margin-bottom:18px;position:relative;overflow:hidden;}
-.mission-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgb(from var(--mc-color) r g b / 0.5) 50%,transparent);pointer-events:none;}
+.mission-card{border:1px solid rgb(from var(--mc-color) r g b / 0.28);background:rgb(from var(--mc-color) r g b / 0.04);margin-bottom:18px;position:relative;overflow:hidden;}
+.mission-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgb(from var(--mc-color) r g b / 0.55) 50%,transparent);pointer-events:none;}
 .mission-card.status-complete{border-color:rgb(from var(--mc-color) r g b / 0.5);background:rgb(from var(--mc-color) r g b / 0.08);}
 .mission-card.status-paused{border-color:rgba(240,237,232,0.1);opacity:0.6;}
 .mission-card-top{padding:16px 18px 12px;cursor:pointer;}
@@ -331,16 +372,31 @@ body.mode-depth .sigil-body-control{display:none;}
 .mission-progress-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
 .mission-progress-lbl{font-family:'Electrolize',sans-serif;font-size:6px;letter-spacing:0.45em;color:rgba(240,237,232,0.35);text-transform:uppercase;}
 .mission-progress-pct{font-family:'Electrolize',sans-serif;font-size:10px;letter-spacing:0.1em;color:rgb(from var(--mc-color) r g b / 0.9);}
-.mission-progress-track{height:2px;background:rgba(240,237,232,0.07);position:relative;}
+.mission-progress-track{height:2px;background:rgba(240,237,232,0.14);position:relative;}
 .mission-progress-fill{height:100%;background:linear-gradient(to right,rgb(from var(--mc-color) r g b / 0.4),var(--mc-color));transition:width 0.5s ease;position:relative;}
 .mission-progress-fill::after{content:'';position:absolute;right:-1px;top:-4px;width:1px;height:10px;background:var(--mc-color);box-shadow:0 0 6px var(--mc-color);}
 .mission-card-body{border-top:1px solid rgb(from var(--mc-color) r g b / 0.12);padding:14px 18px;}
-.mission-milestones-lbl{font-family:'Electrolize',sans-serif;font-size:6px;letter-spacing:0.5em;color:rgba(240,237,232,0.3);display:block;margin-bottom:10px;text-transform:uppercase;}
+.mission-milestones-lbl{font-family:'Electrolize',sans-serif;font-size:6px;letter-spacing:0.5em;color:rgba(240,237,232,0.42);display:block;margin-bottom:10px;text-transform:uppercase;}
 .mission-milestone{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgb(from var(--mc-color) r g b / 0.08);}
 .mission-milestone:last-of-type{border-bottom:none;}
-.mission-ms-check{width:14px;height:14px;border:1px solid rgb(from var(--mc-color) r g b / 0.4);background:transparent;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.2s;outline:none;-webkit-tap-highlight-color:transparent;}
-.mission-ms-check.done{background:rgb(from var(--mc-color) r g b / 0.3);border-color:var(--mc-color);}
-.mission-ms-check.done::after{content:'✓';font-size:8px;color:var(--mc-color);}
+/* Precision check — CSS-drawn checkmark, no unicode */
+.mission-ms-check{
+  width:14px;height:14px;
+  border:1px solid rgb(from var(--mc-color) r g b / 0.4);
+  background:transparent;cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;outline:none;-webkit-tap-highlight-color:transparent;
+  color:var(--mc-color);
+}
+.mission-ms-check.done{background:rgb(from var(--mc-color) r g b / 0.28);border-color:var(--mc-color);}
+.mission-ms-check.done::after{
+  content:'';display:block;
+  width:4px;height:7px;
+  border-right:1.5px solid currentColor;
+  border-bottom:1.5px solid currentColor;
+  transform:rotate(40deg) translateY(-1.5px);
+}
+body.light-accent .mission-ms-check.done{color:#1a1a1a;}
 .mission-ms-text{flex:1;font-family:'Electrolize',sans-serif;font-size:8px;letter-spacing:0.18em;color:rgba(240,237,232,0.7);}
 .mission-ms-text.done{color:rgba(240,237,232,0.3);text-decoration:line-through;}
 .mission-ms-del{background:transparent;border:none;color:rgba(240,237,232,0.2);cursor:pointer;font-size:14px;padding:0;outline:none;flex-shrink:0;transition:color 0.2s;}
@@ -399,7 +455,7 @@ body.mode-depth .sigil-body-control{display:none;}
 }
 .sig-screen-channel{
   font-family:'Electrolize',sans-serif;font-size:6px;letter-spacing:0.4em;
-  color:rgba(240,237,232,0.2);text-transform:uppercase;
+  color:rgba(240,237,232,0.35);text-transform:uppercase;
 }
 #sig-feed{
   flex:1;overflow-y:auto;overflow-x:hidden;
@@ -412,7 +468,7 @@ body.mode-depth .sigil-body-control{display:none;}
 
 /* Individual message blocks */
 .sig-msg{position:relative;padding:18px 24px;contain:layout style;}
-.sig-msg+.sig-msg{border-top:1px solid rgb(from var(--mc-color) r g b / 0.08);}
+.sig-msg+.sig-msg{border-top:1px solid rgb(from var(--mc-color) r g b / 0.11);}
 
 /* Rebecca's transmissions */
 .sig-msg-ai{}
@@ -430,29 +486,41 @@ body.mode-depth .sigil-body-control{display:none;}
   font-family:'Electrolize',sans-serif;
   font-size:clamp(9px,2.2vw,11px);letter-spacing:0.12em;
   line-height:1.7;
-  color:rgba(240,237,232,0.38);
+  color:rgba(240,237,232,0.48);
   text-align:right;
 }
 .sig-msg-label{
-  display:block;
+  display:flex;align-items:center;gap:6px;
   font-family:'Electrolize',sans-serif;font-size:6px;
   letter-spacing:0.55em;text-transform:uppercase;
   margin-bottom:9px;
 }
 .sig-msg-ai .sig-msg-label{
-  color:rgb(from var(--mc-color) r g b / 0.6);
-  text-shadow:0 0 10px rgb(from var(--mc-color) r g b / 0.35);
+  color:rgb(from var(--mc-color) r g b / 0.78);
+  text-shadow:0 0 10px rgb(from var(--mc-color) r g b / 0.4);
+}
+.sig-msg-ai .sig-msg-label::before{
+  content:'';display:inline-block;
+  width:4px;height:4px;border-radius:50%;flex-shrink:0;
+  background:rgb(from var(--mc-color) r g b / 0.9);
+  box-shadow:0 0 6px rgb(from var(--mc-color) r g b / 0.7);
 }
 .sig-msg-user .sig-msg-label{
-  color:rgba(240,237,232,0.18);text-align:right;
+  color:rgba(240,237,232,0.28);
+  text-align:right;justify-content:flex-end;
 }
 /* Left accent bar on Rebecca messages */
 .sig-msg-accent{
   position:absolute;left:0;top:18px;bottom:18px;
   width:2px;
-  background:linear-gradient(to bottom,var(--mc-color),rgb(from var(--mc-color) r g b / 0.08));
-  opacity:0.55;
+  background:linear-gradient(to bottom,
+    rgb(from var(--mc-color) r g b / 0.95) 0%,
+    rgb(from var(--mc-color) r g b / 0.6) 40%,
+    rgb(from var(--mc-color) r g b / 0.12) 100%
+  );
+  opacity:0.78;
   border-radius:0 1px 1px 0;
+  box-shadow:2px 0 8px rgb(from var(--mc-color) r g b / 0.18);
 }
 /* Action chips */
 .sig-msg-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
@@ -487,7 +555,7 @@ body.mode-depth .sigil-body-control{display:none;}
   display:none;
   font-family:'Cormorant Garamond',serif;
   font-size:11px;font-weight:300;font-style:italic;
-  color:rgb(from var(--mc-color) r g b / 0.38);
+  color:rgb(from var(--mc-color) r g b / 0.44);
   letter-spacing:0.04em;line-height:1.55;
   max-width:260px;text-align:center;
   margin-top:8px;
@@ -496,8 +564,8 @@ body.mode-depth .sigil-body-control{display:none;}
 }
 .home-last-msg::before{
   content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
-  width:20px;height:1px;
-  background:rgb(from var(--mc-color) r g b / 0.18);
+  width:24px;height:1px;
+  background:rgb(from var(--mc-color) r g b / 0.24);
 }
 .home-last-msg.visible{display:block;}
 
@@ -508,23 +576,24 @@ body.mode-depth .sigil-body-control{display:none;}
   position:absolute;bottom:-1px;left:0;right:0;height:1px;
   pointer-events:none;z-index:51;
   background:transparent;
-  transition:opacity 0.5s ease;
+  transition:opacity 0.6s ease,height 0.3s ease;
   opacity:0;
 }
 body.rebecca-thinking #rebecca-activity-bar{
   opacity:1;
-  background:linear-gradient(90deg,transparent 0%,rgb(from var(--mc-color) r g b / 0.55) 40%,rgb(from var(--mc-color) r g b / 0.55) 60%,transparent 100%);
+  height:1px;
+  background:linear-gradient(90deg,transparent 0%,rgb(from var(--mc-color) r g b / 0.6) 40%,rgb(from var(--mc-color) r g b / 0.6) 60%,transparent 100%);
   animation:actBarThink 1.8s ease-in-out infinite;
 }
 body.rebecca-speaking #rebecca-activity-bar{
   opacity:1;
   height:2px;
-  background:linear-gradient(90deg,transparent 0%,rgb(from var(--mc-color) r g b / 0.75) 20%,var(--mc-color) 50%,rgb(from var(--mc-color) r g b / 0.75) 80%,transparent 100%);
-  box-shadow:0 0 10px rgb(from var(--mc-color) r g b / 0.7),0 0 24px rgb(from var(--mc-color) r g b / 0.3);
-  animation:actBarSpeak 0.55s ease-in-out infinite;
+  background:linear-gradient(90deg,transparent 0%,rgb(from var(--mc-color) r g b / 0.85) 15%,var(--mc-color) 50%,rgb(from var(--mc-color) r g b / 0.85) 85%,transparent 100%);
+  box-shadow:0 0 12px rgb(from var(--mc-color) r g b / 0.8),0 0 28px rgb(from var(--mc-color) r g b / 0.35);
+  animation:actBarSpeak 0.48s ease-in-out infinite;
 }
-@keyframes actBarThink{0%,100%{opacity:0.25;transform:scaleX(0.55);}50%{opacity:1;transform:scaleX(1);}}
-@keyframes actBarSpeak{0%,100%{opacity:0.7;}50%{opacity:1;}}
+@keyframes actBarThink{0%,100%{opacity:0.28;transform:scaleX(0.5);transform-origin:center;}50%{opacity:1;transform:scaleX(1);}}
+@keyframes actBarSpeak{0%,100%{opacity:0.72;box-shadow:0 0 8px rgb(from var(--mc-color) r g b / 0.6);}50%{opacity:1;box-shadow:0 0 18px rgb(from var(--mc-color) r g b / 0.95),0 0 36px rgb(from var(--mc-color) r g b / 0.4);}}
 
 /* Rebecca label in topbar — appears when active */
 #tb-rebecca-state{
@@ -590,7 +659,7 @@ body.rebecca-speaking #tb-rebecca-state{color:rgb(from var(--mc-color) r g b / 0
   padding:40px 0;
 }
 .contact-card{
-  border:1px solid rgb(from var(--mc-color) r g b / 0.22);
+  border:1px solid rgb(from var(--mc-color) r g b / 0.28);
   background:rgb(from var(--mc-color) r g b / 0.05);
   padding:14px 16px;margin-bottom:8px;
   position:relative;overflow:hidden;
@@ -598,7 +667,7 @@ body.rebecca-speaking #tb-rebecca-state{color:rgb(from var(--mc-color) r g b / 0
 }
 .contact-card::before{
   content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgb(from var(--mc-color) r g b / 0.35) 50%,transparent);
+  background:linear-gradient(90deg,transparent,rgb(from var(--mc-color) r g b / 0.48) 50%,transparent);
   pointer-events:none;
 }
 .contact-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
@@ -609,13 +678,13 @@ body.rebecca-speaking #tb-rebecca-state{color:rgb(from var(--mc-color) r g b / 0
 }
 .contact-card-role{
   font-family:'Electrolize',sans-serif;font-size:7px;letter-spacing:0.35em;
-  color:rgb(from var(--mc-color) r g b / 0.75);display:block;margin-top:4px;
+  color:rgb(from var(--mc-color) r g b / 0.78);display:block;margin-top:4px;
   text-transform:uppercase;
 }
 .contact-card-right{display:flex;align-items:center;gap:12px;flex-shrink:0;}
 .contact-card-ts{
   font-family:'Electrolize',sans-serif;font-size:6px;letter-spacing:0.2em;
-  color:rgba(240,237,232,0.2);
+  color:rgba(240,237,232,0.32);
 }
 .contact-card-del{
   background:transparent;border:none;
@@ -627,9 +696,9 @@ body.rebecca-speaking #tb-rebecca-state{color:rgb(from var(--mc-color) r g b / 0
 .contact-card-notes{
   font-family:'Cormorant Garamond',serif;
   font-size:13px;font-weight:300;font-style:italic;
-  color:rgba(240,237,232,0.5);line-height:1.55;
+  color:rgba(240,237,232,0.58);line-height:1.55;
   margin-top:10px;padding-top:10px;
-  border-top:1px solid rgb(from var(--mc-color) r g b / 0.1);
+  border-top:1px solid rgb(from var(--mc-color) r g b / 0.12);
 }
 
 /* ── SIGNAL MESSAGE FOOTER — copy + timestamp row ── */
@@ -659,24 +728,21 @@ body.rebecca-speaking #tb-rebecca-state{color:rgb(from var(--mc-color) r g b / 0
   transition:all 0.2s ease;-webkit-tap-highlight-color:transparent;
 }
 .sig-feed-clear-btn:active{color:rgba(240,237,232,0.65);border-color:rgba(240,237,232,0.3);}
-  display:block;
-  font-family:'Electrolize',sans-serif;font-size:6px;letter-spacing:0.28em;
-  color:rgba(240,237,232,0.22);margin-top:8px;
-}
 .sig-msg-user .sig-msg-time{text-align:right;}
 
 /* ── HOME AMBIENT STATUS ── */
 #home-ambient{
-  display:none;margin-top:22px;
+  display:none;margin-top:18px;
   align-items:center;gap:8px;
-  font-family:'Electrolize',sans-serif;font-size:5px;letter-spacing:0.55em;
-  color:rgb(from var(--mc-color) r g b / 0.28);
+  font-family:'Electrolize',sans-serif;font-size:6px;letter-spacing:0.55em;
+  color:rgb(from var(--mc-color) r g b / 0.42);
   text-transform:uppercase;
 }
 #home-ambient.visible{display:flex;}
 .home-ambient-dot{
-  width:3px;height:3px;border-radius:50%;flex-shrink:0;
-  background:rgb(from var(--mc-color) r g b / 0.5);
+  width:4px;height:4px;border-radius:50%;flex-shrink:0;
+  background:rgb(from var(--mc-color) r g b / 0.7);
+  box-shadow:0 0 5px rgb(from var(--mc-color) r g b / 0.5);
   animation:statusPulse 3.5s ease-in-out infinite;
 }
 
@@ -692,9 +758,9 @@ body.rebecca-speaking #tb-rebecca-state{color:rgb(from var(--mc-color) r g b / 0
 .sig-quick-btn{
   flex-shrink:0;
   background:transparent;
-  border:1px solid rgb(from var(--mc-color) r g b / 0.22);
-  border-left:2px solid rgb(from var(--mc-color) r g b / 0.22);
-  color:rgb(from var(--mc-color) r g b / 0.55);
+  border:1px solid rgb(from var(--mc-color) r g b / 0.28);
+  border-left:2px solid rgb(from var(--mc-color) r g b / 0.55);
+  color:rgb(from var(--mc-color) r g b / 0.68);
   font-family:'Electrolize',sans-serif;font-size:7px;letter-spacing:0.42em;
   padding:6px 14px 6px 12px;cursor:pointer;
   transition:all 0.22s ease;
@@ -710,16 +776,17 @@ body.rebecca-speaking #tb-rebecca-state{color:rgb(from var(--mc-color) r g b / 0
 .sig-quick-btn:active::before{background:rgb(from var(--mc-color) r g b / 0.18);}
 .sig-quick-btn:active{
   color:var(--white);
-  border-color:rgb(from var(--mc-color) r g b / 0.55);
+  border-color:rgb(from var(--mc-color) r g b / 0.65);
   border-left-color:var(--mc-color);
   box-shadow:0 0 10px rgb(from var(--mc-color) r g b / 0.22);
+  transform:scale(0.97);
 }
 .sig-quick-btn.firing{
   color:var(--mc-color);
   border-color:rgb(from var(--mc-color) r g b / 0.5);
   border-left-color:var(--mc-color);
   border-left-width:2px;
-  box-shadow:0 0 12px rgb(from var(--mc-color) r g b / 0.35);
+  box-shadow:0 0 14px rgb(from var(--mc-color) r g b / 0.38);
 }
 
 /* ── ADJUSTMENT SPARKLINES — state screen ── */
@@ -779,20 +846,24 @@ body.rebecca-speaking #tb-rebecca-state{color:rgb(from var(--mc-color) r g b / 0
 .sig-msg-ai .sig-msg-body p:last-child{margin-bottom:0;}
 .sig-msg-ai .sig-msg-body h3{font-family:'Electrolize',sans-serif;font-size:7px;font-style:normal;letter-spacing:0.5em;color:rgb(from var(--mc-color) r g b / 0.85);text-transform:uppercase;margin:12px 0 6px;text-shadow:0 0 10px rgb(from var(--mc-color) r g b / 0.4);}
 
-/* Thinking indicator */
+/* Thinking indicator — precision scan bars */
 .sig-thinking-row{
   padding:14px 24px;display:flex;align-items:center;gap:10px;
 }
 .sig-thinking-row .sig-msg-label{margin-bottom:0;}
-.sig-thinking-dots{display:flex;gap:5px;align-items:center;}
+.sig-thinking-dots{display:flex;gap:4px;align-items:center;}
 .sig-thinking-dot{
-  width:4px;height:4px;border-radius:50%;
-  background:rgb(from var(--mc-color) r g b / 0.5);
-  animation:thinkDot 1.1s ease-in-out infinite;
+  width:2px;height:10px;
+  background:rgb(from var(--mc-color) r g b / 0.9);
+  box-shadow:0 0 4px rgb(from var(--mc-color) r g b / 0.5);
+  animation:thinkScan 1.2s ease-in-out infinite;
 }
-.sig-thinking-dot:nth-child(2){animation-delay:0.22s;}
-.sig-thinking-dot:nth-child(3){animation-delay:0.44s;}
-@keyframes thinkDot{0%,100%{opacity:0.18;transform:scale(0.7)}50%{opacity:1;transform:scale(1.3)}}
+.sig-thinking-dot:nth-child(2){animation-delay:0.2s;}
+.sig-thinking-dot:nth-child(3){animation-delay:0.4s;}
+@keyframes thinkScan{
+  0%,100%{opacity:0.12;transform:scaleY(0.35);}
+  50%{opacity:1;transform:scaleY(1);}
+}
 
 /* Empty state */
 .sig-screen-empty{
@@ -812,7 +883,7 @@ body.rebecca-speaking #tb-rebecca-state{color:rgb(from var(--mc-color) r g b / 0
 /* Signal screen input zone */
 .sig-screen-input-zone{
   flex-shrink:0;
-  border-top:1px solid rgb(from var(--mc-color) r g b / 0.2);
+  border-top:1px solid rgb(from var(--mc-color) r g b / 0.3);
   display:flex;flex-direction:column;
   background:rgba(0,0,2,0.97);
   box-shadow:0 -10px 40px rgba(0,0,0,0.55);
@@ -829,11 +900,17 @@ body.rebecca-speaking #tb-rebecca-state{color:rgb(from var(--mc-color) r g b / 0
 #sig-screen-text::placeholder{color:rgba(240,237,232,0.2);letter-spacing:0.05em;text-transform:none;}
 .sig-screen-send-btn{
   background:transparent;border:none;
-  color:rgb(from var(--mc-color) r g b / 0.45);
-  font-size:18px;cursor:pointer;padding:0 2px;line-height:1;
-  transition:color 0.2s,transform 0.15s;
+  color:rgb(from var(--mc-color) r g b / 0.55);
+  cursor:pointer;padding:0 2px;line-height:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:color 0.2s,transform 0.15s,filter 0.2s;
+  outline:none;-webkit-tap-highlight-color:transparent;
 }
-.sig-screen-send-btn:active{color:var(--mc-color);transform:translateY(-2px);}
+.sig-screen-send-btn:active{
+  color:var(--mc-color);
+  transform:translateY(-2px);
+  filter:drop-shadow(0 0 6px rgb(from var(--mc-color) r g b / 0.8));
+}
 .sig-screen-mic-btn{
   width:44px;height:44px;border-radius:50%;
   background:rgb(from var(--mc-color) r g b / 0.1);
@@ -1186,15 +1263,15 @@ body.rebecca-speaking #tb-rebecca-state{color:rgb(from var(--mc-color) r g b / 0
 
 /* ── TOPBAR MUSIC BUTTON ── */
 #music-btn{
-  background:transparent;border:none;color:rgba(240,237,232,0.32);
-  font-size:12px;cursor:pointer;padding:2px 0;line-height:1;
-  transition:color 0.25s,text-shadow 0.25s;
+  background:transparent;border:none;color:rgba(240,237,232,0.44);
+  cursor:pointer;padding:4px;line-height:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:color 0.22s ease,filter 0.22s ease;
   outline:none;-webkit-tap-highlight-color:transparent;
-  letter-spacing:0;
 }
 #music-btn:active,#music-btn.active{
   color:var(--mc-color);
-  text-shadow:0 0 10px rgb(from var(--mc-color) r g b / 0.7);
+  filter:drop-shadow(0 0 8px rgb(from var(--mc-color) r g b / 0.75));
 }
 
 
@@ -1280,11 +1357,14 @@ body.rebecca-speaking #tb-rebecca-state{color:rgb(from var(--mc-color) r g b / 0
 #wake-indicator{width:5px;height:5px;border-radius:50%;background:rgba(240,237,232,0.22);transition:background 0.4s,box-shadow 0.4s;flex-shrink:0;}
 #wake-indicator.active{background:#4CAF50;box-shadow:0 0 8px rgba(76,175,80,0.7);}
 #wake-indicator.listening{background:rgb(from var(--mc-color) r g b / 0.9);box-shadow:0 0 10px rgb(from var(--mc-color) r g b / 0.6);animation:statusPulse 1.2s ease-in-out infinite;}
-#settings-btn{background:transparent;border:none;color:rgba(240,237,232,0.36);font-size:13px;cursor:pointer;padding:2px 0;line-height:1;transition:color 0.25s;outline:none;-webkit-tap-highlight-color:transparent;}
-#settings-btn:active{color:var(--white);}
-#notif-btn{background:transparent;border:none;color:rgba(240,237,232,0.36);font-size:13px;cursor:pointer;padding:2px 0;line-height:1;transition:color 0.25s;outline:none;-webkit-tap-highlight-color:transparent;position:relative;}
-#notif-btn:active{color:var(--white);}
-.notif-badge{position:absolute;top:-2px;right:-2px;width:5px;height:5px;border-radius:50%;background:var(--mc-color);display:none;}
+.tb-icon-btn{background:transparent;border:none;color:rgba(240,237,232,0.44);cursor:pointer;padding:4px;line-height:0;display:flex;align-items:center;justify-content:center;transition:color 0.22s ease,filter 0.22s ease;outline:none;-webkit-tap-highlight-color:transparent;position:relative;}
+.tb-icon-btn:active{color:var(--white);filter:drop-shadow(0 0 6px rgb(from var(--mc-color) r g b / 0.8));}
+.tb-icon-btn.active{color:var(--mc-color);filter:drop-shadow(0 0 8px rgb(from var(--mc-color) r g b / 0.75));}
+#settings-btn{background:transparent;border:none;color:rgba(240,237,232,0.44);cursor:pointer;padding:4px;line-height:0;display:flex;align-items:center;justify-content:center;transition:color 0.22s ease,filter 0.22s ease;outline:none;-webkit-tap-highlight-color:transparent;}
+#settings-btn:active{color:var(--white);filter:drop-shadow(0 0 6px rgb(from var(--mc-color) r g b / 0.8));}
+#notif-btn{background:transparent;border:none;color:rgba(240,237,232,0.44);cursor:pointer;padding:4px;line-height:0;display:flex;align-items:center;justify-content:center;transition:color 0.22s ease,filter 0.22s ease;outline:none;-webkit-tap-highlight-color:transparent;position:relative;}
+#notif-btn:active{color:var(--white);filter:drop-shadow(0 0 6px rgb(from var(--mc-color) r g b / 0.8));}
+.notif-badge{position:absolute;top:1px;right:1px;width:5px;height:5px;border-radius:50%;background:var(--mc-color);display:none;box-shadow:0 0 5px rgb(from var(--mc-color) r g b / 0.8);}
 .notif-badge.show{display:block;}
 
 /* ── SETTINGS OVERLAY ── */
@@ -1384,6 +1464,19 @@ body.rebecca-speaking #tb-rebecca-state{color:rgb(from var(--mc-color) r g b / 0
 /* Beam swatch shows the beam color (--beam-rgb), not the accent */
 #beam-color-swatch{background:rgb(var(--beam-rgb));border-color:rgba(var(--beam-rgb),0.4);box-shadow:0 0 8px rgba(var(--beam-rgb),0.3);}
 #beam-color-swatch:hover{box-shadow:0 0 14px rgba(var(--beam-rgb),0.55);}
+/* ── COLOR PRESETS ── */
+.settings-preset-grid{display:flex;gap:7px;flex-wrap:wrap;align-items:center;}
+.settings-preset-swatch{
+  width:30px;height:30px;flex-shrink:0;border:none;padding:0;
+  cursor:pointer;outline:none;position:relative;
+  box-shadow:0 0 0 1px rgba(240,237,232,0.18);
+  transition:box-shadow 0.2s ease,transform 0.15s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.settings-preset-swatch:active{transform:scale(0.87);box-shadow:0 0 0 1px rgba(240,237,232,0.75),0 0 14px rgba(240,237,232,0.22);}
+.settings-preset-swatch[data-active="true"]{box-shadow:0 0 0 1px var(--mc-color),0 0 12px rgb(from var(--mc-color) r g b / 0.5);}
+.settings-preset-swatch[data-active="true"]::after{content:'';position:absolute;inset:5px;border:1px solid rgba(0,0,0,0.45);}
+.settings-preset-label{font-family:'Electrolize',sans-serif;font-size:6px;letter-spacing:0.3em;color:rgba(240,237,232,0.42);text-transform:uppercase;margin-top:5px;text-align:center;}
 .settings-section-label{font-family:'Electrolize',sans-serif;font-size:8px;letter-spacing:0.55em;color:rgb(from var(--mc-color) r g b / 1);display:block;margin-bottom:18px;text-transform:uppercase;text-shadow:0 0 12px rgb(from var(--mc-color) r g b / 0.6);}
 .settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid rgb(from var(--mc-color) r g b / 0.2);}
 .settings-row:last-child{border-bottom:none;}
@@ -1440,8 +1533,8 @@ body.rebecca-speaking #tb-rebecca-state{color:rgb(from var(--mc-color) r g b / 0
 .log-gen-btn-wrap{margin-bottom:20px;}
 
 /* ── STATE SCREEN TABS ── */
-.state-tabs{display:flex;border-bottom:1px solid rgb(from var(--mc-color) r g b / 0.3);margin-bottom:28px;gap:0;}
-.state-tab{background:transparent;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;color:rgba(240,237,232,0.39);font-family:'Electrolize',sans-serif;font-size:8px;letter-spacing:0.5em;padding:0 0 14px;margin-right:32px;cursor:pointer;transition:color 0.3s,border-color 0.3s,text-shadow 0.3s;text-transform:uppercase;outline:none;-webkit-tap-highlight-color:transparent;}
+.state-tabs{display:flex;border-bottom:1px solid rgb(from var(--mc-color) r g b / 0.42);margin-bottom:28px;gap:0;}
+.state-tab{background:transparent;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;color:rgba(240,237,232,0.45);font-family:'Electrolize',sans-serif;font-size:8px;letter-spacing:0.5em;padding:0 0 14px;margin-right:32px;cursor:pointer;transition:color 0.3s,border-color 0.3s,text-shadow 0.3s;text-transform:uppercase;outline:none;-webkit-tap-highlight-color:transparent;}
 .state-tab.active{color:rgba(240,237,232,0.95);border-bottom-color:var(--mc-color);text-shadow:0 0 12px rgb(from var(--mc-color) r g b / 0.5);}
 .state-panel{display:none;flex-direction:column;}
 .state-panel.active{display:flex;}
@@ -1450,15 +1543,53 @@ body.rebecca-speaking #tb-rebecca-state{color:rgb(from var(--mc-color) r g b / 0
 @keyframes cardReveal{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes glowPulse{0%,100%{box-shadow:0 0 20px rgb(from var(--mc-color) r g b / 0.15),inset 0 0 30px rgb(from var(--mc-color) r g b / 0.12)}50%{box-shadow:0 0 32px rgb(from var(--mc-color) r g b / 0.2),inset 0 0 40px rgb(from var(--mc-color) r g b / 0.15)}}
 
-.rb-analysis{border:1px solid rgb(from var(--mc-color) r g b / 0.3);background:rgb(from var(--mc-color) r g b / 0.16);padding:18px 20px;margin-bottom:24px;position:relative;animation:cardReveal 0.5s ease forwards;box-shadow:0 0 40px rgb(from var(--mc-color) r g b / 0.18),inset 0 0 60px rgb(from var(--mc-color) r g b / 0.13);}
-.rb-analysis::before{content:'';position:absolute;top:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgb(from var(--mc-color) r g b / 0.7) 30%,rgb(from var(--mc-color) r g b / 0.7) 70%,transparent);pointer-events:none;}
+.rb-analysis{
+  border:1px solid rgb(from var(--mc-color) r g b / 0.32);
+  background:rgb(from var(--mc-color) r g b / 0.16);
+  padding:18px 20px;margin-bottom:24px;position:relative;
+  animation:cardReveal 0.5s ease forwards;
+  box-shadow:0 0 40px rgb(from var(--mc-color) r g b / 0.18),inset 0 0 60px rgb(from var(--mc-color) r g b / 0.13);
+}
+.rb-analysis::before{
+  content:'';position:absolute;top:-1px;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgb(from var(--mc-color) r g b / 0.45) 20%,
+    rgb(from var(--mc-color) r g b / 0.92) 50%,
+    rgb(from var(--mc-color) r g b / 0.45) 80%,
+    transparent 100%
+  );
+  box-shadow:0 0 10px rgb(from var(--mc-color) r g b / 0.42);
+  pointer-events:none;
+}
 /* Scan line texture */
-.rb-analysis::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,0.01) 3px,rgba(255,255,255,0.01) 4px);pointer-events:none;}
-.rb-analysis-label{font-family:'Electrolize',sans-serif;font-size:6px;letter-spacing:0.55em;color:rgb(from var(--mc-color) r g b / 0.75);display:block;margin-bottom:12px;text-transform:uppercase;text-shadow:0 0 10px rgb(from var(--mc-color) r g b / 0.5);}
+.rb-analysis::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,0.012) 3px,rgba(255,255,255,0.012) 4px);pointer-events:none;}
+.rb-analysis-label{
+  font-family:'Electrolize',sans-serif;font-size:6px;letter-spacing:0.55em;
+  color:rgb(from var(--mc-color) r g b / 0.88);
+  display:flex;align-items:center;gap:7px;
+  margin-bottom:14px;text-transform:uppercase;
+  text-shadow:0 0 12px rgb(from var(--mc-color) r g b / 0.55);
+  position:relative;z-index:1;
+}
+.rb-analysis-label::before{
+  content:'';display:inline-block;
+  width:4px;height:4px;border-radius:50%;flex-shrink:0;
+  background:rgb(from var(--mc-color) r g b / 0.95);
+  box-shadow:0 0 7px rgb(from var(--mc-color) r g b / 0.8),0 0 14px rgb(from var(--mc-color) r g b / 0.4);
+}
 .rb-analysis-text{font-family:'Cormorant Garamond',serif;font-size:clamp(16px,4vw,19px);font-weight:300;font-style:italic;line-height:1.65;color:rgba(240,237,232,0.88);position:relative;z-index:1;}
 .rb-analysis-text.loading{color:rgba(240,237,232,0.39);animation:statusPulse 1.5s ease-in-out infinite;}
-.rb-analysis-refresh{position:absolute;top:14px;right:14px;background:transparent;border:none;color:rgba(240,237,232,0.34);cursor:pointer;font-size:13px;padding:0;transition:color 0.2s,transform 0.5s;outline:none;-webkit-tap-highlight-color:transparent;z-index:2;}
-.rb-analysis-refresh:active{color:var(--mc-color);transform:rotate(180deg);}
+.rb-analysis-refresh{
+  position:absolute;top:14px;right:14px;
+  background:transparent;border:none;
+  color:rgba(240,237,232,0.34);
+  cursor:pointer;padding:4px;line-height:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:color 0.2s,transform 0.5s,filter 0.2s;
+  outline:none;-webkit-tap-highlight-color:transparent;z-index:2;
+}
+.rb-analysis-refresh:active{color:var(--mc-color);transform:rotate(180deg);filter:drop-shadow(0 0 6px rgb(from var(--mc-color) r g b / 0.7));}
 
 /* Time range selector */
 .dash-range{display:flex;gap:6px;margin-bottom:24px;align-items:center;}
@@ -1469,25 +1600,25 @@ body.rebecca-speaking #tb-rebecca-state{color:rgb(from var(--mc-color) r g b / 0
 /* Metric cards — atmospheric, cinematic */
 .metric-card{border:1px solid rgb(from var(--mc-color) r g b / 0.28);background:rgb(from var(--mc-color) r g b / 0.14);padding:18px 18px 14px;margin-bottom:16px;position:relative;transition:border-color 0.4s,box-shadow 0.4s;opacity:0;animation:cardReveal 0.45s ease forwards;}
 /* Scan line atmosphere */
-.metric-card::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 4px,rgba(255,255,255,0.008) 4px,rgba(255,255,255,0.008) 5px);pointer-events:none;}
-/* Top accent line */
-.metric-card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgb(from var(--mc-color) r g b / 0.35) 50%,transparent);pointer-events:none;transition:opacity 0.4s;}
+.metric-card::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 4px,rgba(255,255,255,0.012) 4px,rgba(255,255,255,0.012) 5px);pointer-events:none;}
+/* Top accent line — stronger peak */
+.metric-card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgb(from var(--mc-color) r g b / 0.55) 50%,transparent);box-shadow:0 0 6px rgb(from var(--mc-color) r g b / 0.28);pointer-events:none;transition:opacity 0.4s;}
 .metric-card:nth-child(1){animation-delay:0.05s}
 .metric-card:nth-child(2){animation-delay:0.12s}
 .metric-card:nth-child(3){animation-delay:0.19s}
 .metric-card:nth-child(4){animation-delay:0.26s}
 .metric-card:nth-child(5){animation-delay:0.33s}
 .metric-card:nth-child(6){animation-delay:0.4s}
-.metric-card:hover{border-color:rgb(from var(--mc-color) r g b / 0.35);box-shadow:0 0 24px rgb(from var(--mc-color) r g b / 0.17),inset 0 0 40px rgb(from var(--mc-color) r g b / 0.13);}
+.metric-card:hover{border-color:rgb(from var(--mc-color) r g b / 0.38);box-shadow:0 0 28px rgb(from var(--mc-color) r g b / 0.2),inset 0 0 44px rgb(from var(--mc-color) r g b / 0.14);}
 .metric-card-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:10px;position:relative;z-index:1;}
 .metric-card-name{font-family:'Electrolize',sans-serif;font-size:7px;letter-spacing:0.5em;color:rgb(from var(--mc-color) r g b / 0.85);text-transform:uppercase;text-shadow:0 0 8px rgb(from var(--mc-color) r g b / 0.35);}
-.metric-card-val{font-family:'Electrolize',sans-serif;font-size:clamp(32px,8vw,42px);color:var(--white);letter-spacing:0.03em;line-height:1;text-shadow:0 0 30px rgba(240,237,232,0.27);}
+.metric-card-val{font-family:'Electrolize',sans-serif;font-size:clamp(32px,8vw,42px);color:var(--white);letter-spacing:0.03em;line-height:1;text-shadow:0 0 30px rgb(from var(--mc-color) r g b / 0.22),0 0 60px rgb(from var(--mc-color) r g b / 0.1);}
 .metric-card-val.war-mode{color:var(--mc-color);text-shadow:0 0 20px rgb(from var(--mc-color) r g b / 0.6),0 0 60px rgb(from var(--mc-color) r g b / 0.35);}
 .metric-chart-wrap{position:relative;margin:8px 0 10px;height:88px;}
 .metric-chart-glow{position:absolute;inset:0;bottom:0;background:radial-gradient(ellipse 80% 50% at 50% 100%,rgb(from var(--mc-color) r g b / 0.24),transparent);pointer-events:none;}
 .metric-chart{width:100%;height:88px;display:block;position:relative;z-index:1;touch-action:none;}
 .metric-card-footer{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1;}
-.metric-stat{font-family:'Electrolize',sans-serif;font-size:7px;letter-spacing:0.3em;color:rgba(240,237,232,0.34);text-transform:uppercase;}
+.metric-stat{font-family:'Electrolize',sans-serif;font-size:7px;letter-spacing:0.3em;color:rgba(240,237,232,0.44);text-transform:uppercase;}
 .metric-trend-indicator{font-family:'Electrolize',sans-serif;font-size:7px;letter-spacing:0.25em;}
 .metric-trend-up{color:rgb(from var(--mc-color) r g b / 0.8);}
 .metric-trend-down{color:rgba(240,237,232,0.39);}
@@ -1504,14 +1635,14 @@ body.rebecca-speaking #tb-rebecca-state{color:rgb(from var(--mc-color) r g b / 0
 .adj-gauge:nth-child(2){animation-delay:0.1s}
 .adj-gauge:nth-child(3){animation-delay:0.16s}
 .adj-gauge:nth-child(4){animation-delay:0.22s}
-.adj-gauge::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgb(from var(--mc-color) r g b / 0.4) 50%,transparent);pointer-events:none;}
+.adj-gauge::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgb(from var(--mc-color) r g b / 0.55) 50%,transparent);box-shadow:0 0 6px rgb(from var(--mc-color) r g b / 0.28);pointer-events:none;}
 .adj-gauge-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .adj-gauge-name{font-family:'Electrolize',sans-serif;font-size:7px;letter-spacing:0.48em;color:rgb(from var(--mc-color) r g b / 0.9);text-transform:uppercase;text-shadow:0 0 8px rgb(from var(--mc-color) r g b / 0.35);}
 .adj-gauge-controls{display:flex;align-items:center;gap:12px;}
 .adj-btn{background:transparent;border:1px solid rgb(from var(--mc-color) r g b / 0.35);color:rgba(240,237,232,0.45);font-family:'Electrolize',sans-serif;font-size:9px;width:28px;height:28px;cursor:pointer;transition:all 0.2s;outline:none;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;}
 .adj-btn:active{border-color:var(--mc-color);color:var(--white);background:rgb(from var(--mc-color) r g b / 0.27);box-shadow:0 0 12px rgb(from var(--mc-color) r g b / 0.3);}
-.adj-gauge-val{font-family:'Electrolize',sans-serif;font-size:clamp(22px,5.5vw,28px);color:var(--white);min-width:48px;text-align:center;letter-spacing:0.03em;line-height:1;transition:color 0.3s;}
-.adj-track{height:2px;background:rgba(240,237,232,0.18);position:relative;overflow:visible;margin-top:4px;}
+.adj-gauge-val{font-family:'Electrolize',sans-serif;font-size:clamp(22px,5.5vw,28px);color:var(--white);min-width:48px;text-align:center;letter-spacing:0.03em;line-height:1;transition:color 0.3s;text-shadow:0 0 20px rgb(from var(--mc-color) r g b / 0.18);}
+.adj-track{height:3px;background:rgba(240,237,232,0.22);position:relative;overflow:visible;margin-top:4px;}
 .adj-fill{height:100%;background:linear-gradient(to right,rgb(from var(--mc-color) r g b / 0.4),var(--mc-color));transition:width 0.3s ease;position:relative;}
 .adj-fill::after{content:'';position:absolute;right:-1px;top:-6px;width:1px;height:14px;background:var(--mc-color);box-shadow:0 0 8px var(--mc-color),0 0 20px rgb(from var(--mc-color) r g b / 0.5);}
 .adj-note{font-family:'Electrolize',sans-serif;font-size:6px;letter-spacing:0.25em;color:rgba(240,237,232,0.24);margin-top:10px;text-transform:uppercase;}
@@ -1534,12 +1665,52 @@ body.rebecca-speaking #tb-rebecca-state{color:rgb(from var(--mc-color) r g b / 0
 .ms-item-meta{display:flex;align-items:center;gap:8px;margin-top:4px;}
 
 /* ── OPS INSIGHT CARD ── */
-.ops-insight{border:1px solid rgb(from var(--mc-color) r g b / 0.4);background:rgb(from var(--mc-color) r g b / 0.15);padding:14px 16px;margin-bottom:20px;display:none;position:relative;}
+.ops-insight{
+  border:1px solid rgb(from var(--mc-color) r g b / 0.38);
+  background:rgb(from var(--mc-color) r g b / 0.15);
+  padding:18px 20px;margin-bottom:20px;
+  display:none;position:relative;
+  box-shadow:inset 0 0 40px rgb(from var(--mc-color) r g b / 0.08);
+}
 .ops-insight.show{display:block;}
-.ops-insight-label{font-family:'Electrolize',sans-serif;font-size:6px;letter-spacing:0.5em;color:rgb(from var(--mc-color) r g b / 0.7);display:block;margin-bottom:8px;text-transform:uppercase;}
-.ops-insight-text{font-size:clamp(13px,3.3vw,15px);font-weight:300;line-height:1.7;color:rgba(240,237,232,0.75);font-style:italic;}
-.ops-insight-refresh{position:absolute;top:10px;right:10px;background:transparent;border:none;color:rgba(240,237,232,0.27);cursor:pointer;font-size:12px;padding:0;transition:color 0.2s,transform 0.4s;}
-.ops-insight-refresh:active{color:var(--mc-color);transform:rotate(180deg);}
+.ops-insight::before{
+  content:'';position:absolute;top:-1px;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgb(from var(--mc-color) r g b / 0.42) 20%,
+    rgb(from var(--mc-color) r g b / 0.88) 50%,
+    rgb(from var(--mc-color) r g b / 0.42) 80%,
+    transparent 100%
+  );
+  box-shadow:0 0 10px rgb(from var(--mc-color) r g b / 0.4);
+  pointer-events:none;
+}
+.ops-insight::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,0.010) 3px,rgba(255,255,255,0.010) 4px);pointer-events:none;}
+.ops-insight-label{
+  font-family:'Electrolize',sans-serif;font-size:6px;letter-spacing:0.55em;
+  color:rgb(from var(--mc-color) r g b / 0.88);
+  display:flex;align-items:center;gap:7px;
+  margin-bottom:12px;text-transform:uppercase;
+  text-shadow:0 0 12px rgb(from var(--mc-color) r g b / 0.55);
+  position:relative;z-index:1;
+}
+.ops-insight-label::before{
+  content:'';display:inline-block;
+  width:4px;height:4px;border-radius:50%;flex-shrink:0;
+  background:rgb(from var(--mc-color) r g b / 0.95);
+  box-shadow:0 0 7px rgb(from var(--mc-color) r g b / 0.8),0 0 14px rgb(from var(--mc-color) r g b / 0.4);
+}
+.ops-insight-text{font-family:'Cormorant Garamond',serif;font-size:clamp(13px,3.3vw,15px);font-weight:300;line-height:1.7;color:rgba(240,237,232,0.82);font-style:italic;position:relative;z-index:1;}
+.ops-insight-refresh{
+  position:absolute;top:14px;right:14px;
+  background:transparent;border:none;
+  color:rgba(240,237,232,0.34);
+  cursor:pointer;padding:4px;line-height:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:color 0.2s,transform 0.45s,filter 0.2s;
+  outline:none;-webkit-tap-highlight-color:transparent;z-index:2;
+}
+.ops-insight-refresh:active{color:var(--mc-color);transform:rotate(180deg);filter:drop-shadow(0 0 6px rgb(from var(--mc-color) r g b / 0.7));}
 .ops-insight-loading{opacity:0.35;animation:statusPulse 1.5s ease-in-out infinite;}
 
 /* ── SEARCH INDICATOR ── */
@@ -1629,7 +1800,7 @@ body.light-accent .mode-opt.active .os-btn-inner span{color:#0a0a0a;}
 .ops-empty{color:rgba(240,237,232,0.27);font-style:italic;font-size:14px;text-align:center;padding:48px 0;line-height:2;}
 .ops-net{display:flex;justify-content:space-between;align-items:flex-end;padding:14px 0 16px;border-bottom:1px solid rgb(from var(--mc-color) r g b / 0.27);margin-bottom:20px;}
 .ops-net-lbl{font-family:'Electrolize',sans-serif;font-size:7px;letter-spacing:0.45em;color:rgb(from var(--mc-color) r g b / 0.8);display:block;margin-bottom:5px;}
-.ops-net-val{font-family:'Electrolize',sans-serif;font-size:26px;letter-spacing:0.04em;color:var(--white);}
+.ops-net-val{font-family:'Electrolize',sans-serif;font-size:26px;letter-spacing:0.04em;color:var(--white);text-shadow:0 0 24px rgb(from var(--mc-color) r g b / 0.2);}
 .ops-target-wrap{text-align:right;}
 .ops-target-lbl{font-family:'Electrolize',sans-serif;font-size:7px;letter-spacing:0.35em;color:rgb(from var(--mc-color) r g b / 0.7);display:block;margin-bottom:7px;}
 .ops-target-track{width:90px;height:2px;background:rgba(240,237,232,0.2);margin-left:auto;position:relative;}
@@ -1824,16 +1995,16 @@ body.light-accent .mode-opt.active .os-btn-inner span{color:#0a0a0a;}
 .sig-wave-strip{
   flex-shrink:0;
   padding:8px 20px 0;
-  height:24px;
+  height:28px;
   display:flex;align-items:center;
 }
 .sig-screen-wave{
-  display:block;width:100%;height:24px;
+  display:block;width:100%;height:28px;
 }
 .sig-controls-row{
   display:flex;align-items:center;gap:12px;
   padding:10px 20px calc(10px + env(safe-area-inset-bottom));
-  border-top:1px solid rgb(from var(--mc-color) r g b / 0.1);
+  border-top:1px solid rgb(from var(--mc-color) r g b / 0.18);
 }
 
 /* ── ERROR TOAST — always on top, always visible ── */
@@ -2012,9 +2183,34 @@ body.light-accent .mode-opt.active .os-btn-inner span{color:#0a0a0a;}
     </div>
     <div class="tb-right">
       <span id="tb-clock"></span>
-      <button id="music-btn" title="Broadcast" onclick="openBroadcast()">♫</button>
-      <button id="notif-btn" title="Notifications" onclick="toggleNotifPanel()">◎<span class="notif-badge" id="notif-badge"></span></button>
-      <button id="settings-btn" title="Settings" onclick="openSettings()">⚙</button>
+      <button id="music-btn" title="Broadcast" onclick="openBroadcast()">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+          <circle cx="7.5" cy="9.5" r="1.4" fill="currentColor"/>
+          <path d="M4.8 7.2 A3.5 3.5 0 0 1 10.2 7.2" stroke="currentColor" stroke-width="1.15" stroke-linecap="round"/>
+          <path d="M2.8 5.0 A6.0 6.0 0 0 1 12.2 5.0" stroke="currentColor" stroke-width="0.95" stroke-linecap="round" opacity="0.55"/>
+        </svg>
+      </button>
+      <button id="notif-btn" title="Notifications" onclick="toggleNotifPanel()">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M7.5 2.5 C5.3 2.5 3.5 4.3 3.5 6.5 L3.5 9.5 L2.5 10.5 H12.5 L11.5 9.5 L11.5 6.5 C11.5 4.3 9.7 2.5 7.5 2.5 Z"/>
+          <path d="M6 10.5 A1.5 1.5 0 0 0 9 10.5"/>
+          <line x1="7.5" y1="1" x2="7.5" y2="2.5" stroke-width="1.2"/>
+        </svg>
+        <span class="notif-badge" id="notif-badge"></span>
+      </button>
+      <button id="settings-btn" title="Settings" onclick="openSettings()">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true">
+          <circle cx="7.5" cy="7.5" r="2" stroke-width="1.15"/>
+          <line x1="7.5" y1="1"   x2="7.5" y2="3.8"  stroke-width="1.1" opacity="0.7"/>
+          <line x1="7.5" y1="11.2" x2="7.5" y2="14"  stroke-width="1.1" opacity="0.7"/>
+          <line x1="1"   y1="7.5" x2="3.8"  y2="7.5" stroke-width="1.1" opacity="0.7"/>
+          <line x1="11.2" y1="7.5" x2="14"  y2="7.5" stroke-width="1.1" opacity="0.7"/>
+          <line x1="3.2" y1="3.2" x2="5.0"  y2="5.0" stroke-width="1.0" opacity="0.45"/>
+          <line x1="10.0" y1="10.0" x2="11.8" y2="11.8" stroke-width="1.0" opacity="0.45"/>
+          <line x1="11.8" y1="3.2" x2="10.0" y2="5.0"  stroke-width="1.0" opacity="0.45"/>
+          <line x1="3.2" y1="11.8" x2="5.0"  y2="10.0" stroke-width="1.0" opacity="0.45"/>
+        </svg>
+      </button>
     </div>
   </div>
 
@@ -2166,30 +2362,30 @@ body.light-accent .mode-opt.active .os-btn-inner span{color:#0a0a0a;}
               <g class="sigil-body sigil-body-control">
                 <!-- Outer diamond rotates CW -->
                 <g class="sig-outer-ring">
-                  <polygon points="60,6 114,60 60,114 6,60" stroke="var(--mc-color)" stroke-width="0.6" fill="none" opacity="0.3"/>
+                  <polygon points="60,6 114,60 60,114 6,60" stroke="var(--mc-color)" stroke-width="0.6" fill="none" opacity="0.42"/>
                   <!-- Vertex extensions (circuit traces) -->
-                  <line x1="60" y1="6" x2="60" y2="1" stroke="var(--mc-color)" stroke-width="0.9" opacity="0.55"/>
-                  <line x1="114" y1="60" x2="119" y2="60" stroke="var(--mc-color)" stroke-width="0.9" opacity="0.55"/>
-                  <line x1="60" y1="114" x2="60" y2="119" stroke="var(--mc-color)" stroke-width="0.9" opacity="0.55"/>
-                  <line x1="6" y1="60" x2="1" y2="60" stroke="var(--mc-color)" stroke-width="0.9" opacity="0.55"/>
+                  <line x1="60" y1="6" x2="60" y2="1" stroke="var(--mc-color)" stroke-width="0.9" opacity="0.65"/>
+                  <line x1="114" y1="60" x2="119" y2="60" stroke="var(--mc-color)" stroke-width="0.9" opacity="0.65"/>
+                  <line x1="60" y1="114" x2="60" y2="119" stroke="var(--mc-color)" stroke-width="0.9" opacity="0.65"/>
+                  <line x1="6" y1="60" x2="1" y2="60" stroke="var(--mc-color)" stroke-width="0.9" opacity="0.65"/>
                   <!-- Edge midpoint data nodes -->
-                  <rect x="84.5" y="31" width="4" height="4" stroke="var(--mc-color)" stroke-width="0.7" fill="none" opacity="0.45"/>
-                  <rect x="84.5" y="85" width="4" height="4" stroke="var(--mc-color)" stroke-width="0.7" fill="none" opacity="0.45"/>
-                  <rect x="31" y="85" width="4" height="4" stroke="var(--mc-color)" stroke-width="0.7" fill="none" opacity="0.45"/>
-                  <rect x="31" y="31" width="4" height="4" stroke="var(--mc-color)" stroke-width="0.7" fill="none" opacity="0.45"/>
+                  <rect x="84.5" y="31" width="4" height="4" stroke="var(--mc-color)" stroke-width="0.7" fill="none" opacity="0.55"/>
+                  <rect x="84.5" y="85" width="4" height="4" stroke="var(--mc-color)" stroke-width="0.7" fill="none" opacity="0.55"/>
+                  <rect x="31" y="85" width="4" height="4" stroke="var(--mc-color)" stroke-width="0.7" fill="none" opacity="0.55"/>
+                  <rect x="31" y="31" width="4" height="4" stroke="var(--mc-color)" stroke-width="0.7" fill="none" opacity="0.55"/>
                 </g>
                 <!-- Inner diamond rotates CCW, dashed -->
-                <polygon class="sig-mid-ring" points="60,30 90,60 60,90 30,60" stroke="var(--mc-color)" stroke-width="0.8" fill="none" opacity="0.5" stroke-dasharray="5 4.7"/>
+                <polygon class="sig-mid-ring" points="60,30 90,60 60,90 30,60" stroke="var(--mc-color)" stroke-width="0.8" fill="none" opacity="0.6" stroke-dasharray="5 4.7"/>
                 <!-- Cardinal precision lines (static) -->
-                <g stroke="var(--mc-color)" stroke-width="0.6" opacity="0.45">
+                <g stroke="var(--mc-color)" stroke-width="0.6" opacity="0.55">
                   <line x1="60" y1="42" x2="60" y2="51"/>
                   <line x1="60" y1="69" x2="60" y2="78"/>
                   <line x1="42" y1="60" x2="51" y2="60"/>
                   <line x1="69" y1="60" x2="78" y2="60"/>
                 </g>
-                <!-- Center command node -->
-                <rect x="56.5" y="56.5" width="7" height="7" stroke="var(--mc-color)" stroke-width="0.8" fill="none" opacity="0.75"/>
-                <circle class="sig-center-dot" cx="60" cy="60" r="1.8" fill="var(--mc-color)" opacity="0.9"/>
+                <!-- Center command node — filled with inner glow -->
+                <rect x="56.5" y="56.5" width="7" height="7" stroke="var(--mc-color)" stroke-width="0.9" fill="rgb(from var(--mc-color) r g b / 0.1)" opacity="0.88"/>
+                <circle class="sig-center-dot" cx="60" cy="60" r="1.8" fill="var(--mc-color)" opacity="0.95"/>
               </g>
 
               <!-- ── DEPTH: consciousness arcs ── -->
@@ -2220,6 +2416,10 @@ body.light-accent .mode-opt.active .os-btn-inner span{color:#0a0a0a;}
 
         <!-- Rebecca's message — glass panel -->
         <div class="home-glass-panel">
+          <span class="hgp-corner hgp-tl" aria-hidden="true"></span>
+          <span class="hgp-corner hgp-tr" aria-hidden="true"></span>
+          <span class="hgp-corner hgp-bl" aria-hidden="true"></span>
+          <span class="hgp-corner hgp-br" aria-hidden="true"></span>
           <div class="home-msg" id="home-msg"></div>
           <div class="home-meta" id="home-meta"></div>
           <div id="home-last-msg" class="home-last-msg"></div>
@@ -2248,8 +2448,17 @@ body.light-accent .mode-opt.active .os-btn-inner span{color:#0a0a0a;}
 
         <!-- Rebecca's analysis -->
         <div class="rb-analysis" id="rb-analysis">
-          <span class="rb-analysis-label">▸ REBECCA'S READ</span>
-          <button class="rb-analysis-refresh" id="rb-analysis-refresh" title="Refresh">↻</button>
+          <span class="hgp-corner hgp-tl" aria-hidden="true"></span>
+          <span class="hgp-corner hgp-tr" aria-hidden="true"></span>
+          <span class="hgp-corner hgp-bl" aria-hidden="true"></span>
+          <span class="hgp-corner hgp-br" aria-hidden="true"></span>
+          <span class="rb-analysis-label">REBECCA'S READ</span>
+          <button class="rb-analysis-refresh" id="rb-analysis-refresh" title="Refresh" aria-label="Refresh analysis">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12.5 7 A5.5 5.5 0 1 1 9.5 2.2"/>
+              <path d="M9.5 1 L9.5 3.5 L12 3.5"/>
+            </svg>
+          </button>
           <div class="rb-analysis-text" id="rb-analysis-text">—</div>
         </div>
 
@@ -2350,7 +2559,13 @@ body.light-accent .mode-opt.active .os-btn-inner span{color:#0a0a0a;}
             </svg>
           </button>
           <input id="sig-screen-text" type="text" placeholder="transmit..." autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
-          <button class="sig-screen-send-btn" onclick="sigSignalSend()">↑</button>
+          <button class="sig-screen-send-btn" onclick="sigSignalSend()" title="Transmit" aria-label="Send">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <line x1="8" y1="13" x2="8" y2="3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+              <path d="M4.5 6.5 L8 3 L11.5 6.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="5" y1="11.5" x2="11" y2="11.5" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" opacity="0.5"/>
+            </svg>
+          </button>
         </div>
       </div>
     </div>
@@ -2370,8 +2585,17 @@ body.light-accent .mode-opt.active .os-btn-inner span{color:#0a0a0a;}
       <!-- Operations panel -->
       <div class="ops-panel active" data-panel="operations">
         <div class="ops-insight" id="ops-insight">
-          <span class="ops-insight-label">▸ INTEL</span>
-          <button class="ops-insight-refresh" id="ops-insight-refresh" onclick="triggerOpsAnalysis()" title="Refresh intel">↻</button>
+          <span class="hgp-corner hgp-tl" aria-hidden="true"></span>
+          <span class="hgp-corner hgp-tr" aria-hidden="true"></span>
+          <span class="hgp-corner hgp-bl" aria-hidden="true"></span>
+          <span class="hgp-corner hgp-br" aria-hidden="true"></span>
+          <span class="ops-insight-label">INTEL</span>
+          <button class="ops-insight-refresh" id="ops-insight-refresh" onclick="triggerOpsAnalysis()" title="Refresh intel" aria-label="Refresh intel">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12.5 7 A5.5 5.5 0 1 1 9.5 2.2"/>
+              <path d="M9.5 1 L9.5 3.5 L12 3.5"/>
+            </svg>
+          </button>
           <div class="ops-insight-text" id="ops-insight-text"></div>
         </div>
         <div class="ops-tabs" id="ops-tabs"></div>
@@ -2488,63 +2712,64 @@ body.light-accent .mode-opt.active .os-btn-inner span{color:#0a0a0a;}
       <div class="settings-section">
         <span class="settings-section-label">INTERFACE</span>
 
-        <!-- MODE COLORS — per mode identity -->
-        <div class="settings-row-label" style="margin-bottom:10px;font-size:7px;letter-spacing:0.38em;opacity:0.55;">MODE COLORS</div>
-
-        <div class="settings-row" style="align-items:center;">
+        <div class="settings-row">
           <div>
-            <div class="settings-row-label">CONTROL</div>
-            <div class="settings-row-sub">Precision mode — default: platinum steel</div>
+            <div class="settings-row-label">Accent Color</div>
+            <div class="settings-row-sub">System color — glows, borders, sigil. Default: platinum white.</div>
           </div>
           <div class="settings-color-swatch-wrap">
-            <input type="color" id="color-control-input" class="settings-color-input" value="#b0c4d4"
-              oninput="setModeColor('control',this.value)"
-              onchange="setModeColor('control',this.value)">
-            <label for="color-control-input" class="settings-color-swatch" id="color-control-swatch"></label>
-          </div>
-        </div>
-
-        <div class="settings-row" style="align-items:center;">
-          <div>
-            <div class="settings-row-label">DEPTH</div>
-            <div class="settings-row-sub">Presence mode — default: amber gold</div>
-          </div>
-          <div class="settings-color-swatch-wrap">
-            <input type="color" id="color-depth-input" class="settings-color-input" value="#c0a260"
-              oninput="setModeColor('depth',this.value)"
-              onchange="setModeColor('depth',this.value)">
-            <label for="color-depth-input" class="settings-color-swatch" id="color-depth-swatch"></label>
-          </div>
-        </div>
-
-        <div class="settings-row" style="align-items:center;">
-          <div>
-            <div class="settings-row-label">WAR</div>
-            <div class="settings-row-sub">War mode — default: electric crimson</div>
-          </div>
-          <div class="settings-color-swatch-wrap">
-            <input type="color" id="color-war-input" class="settings-color-input" value="#cc2630"
-              oninput="setModeColor('war',this.value)"
-              onchange="setModeColor('war',this.value)">
-            <label for="color-war-input" class="settings-color-swatch" id="color-war-swatch"></label>
+            <input type="color" id="accent-color-input" class="settings-color-input" value="#eeeef8"
+              oninput="setAccentColor(this.value)"
+              onchange="setAccentColor(this.value)">
+            <label for="accent-color-input" class="settings-color-swatch" id="accent-color-swatch"></label>
           </div>
         </div>
 
         <div class="settings-row">
           <div>
-            <div class="settings-row-label">Reset Mode Colors</div>
-            <div class="settings-row-sub">Restore all three to defaults</div>
+            <div class="settings-row-label">Reset Color</div>
+            <div class="settings-row-sub">Return to default platinum white</div>
           </div>
-          <button class="settings-action-btn" onclick="resetModeColors()">RESET</button>
+          <button class="settings-action-btn" onclick="setAccentColor('#eeeef8');document.getElementById('accent-color-input').value='#eeeef8';_syncPresetActive('#eeeef8');">RESET</button>
         </div>
 
-        <!-- BEAM LIGHT -->
-        <div class="settings-row-label" style="margin:22px 0 10px;font-size:7px;letter-spacing:0.38em;opacity:0.55;">AMBIENT LIGHT</div>
+        <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:14px;">
+          <div>
+            <div class="settings-row-label">Color Presets</div>
+            <div class="settings-row-sub">One tap — system recolors instantly</div>
+          </div>
+          <div class="settings-preset-grid">
+            <div style="display:flex;flex-direction:column;align-items:center;">
+              <button class="settings-preset-swatch" style="background:#eeeef8;" data-preset="#eeeef8" data-active="true" title="Platinum White" onclick="_applyPreset('#eeeef8')"></button>
+              <span class="settings-preset-label">PLAT</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;">
+              <button class="settings-preset-swatch" style="background:#ebf6ff;" data-preset="#ebf6ff" title="Arctic" onclick="_applyPreset('#ebf6ff')"></button>
+              <span class="settings-preset-label">ICE</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;">
+              <button class="settings-preset-swatch" style="background:#c8a84b;" data-preset="#c8a84b" title="Gold" onclick="_applyPreset('#c8a84b')"></button>
+              <span class="settings-preset-label">GOLD</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;">
+              <button class="settings-preset-swatch" style="background:#9b1b2a;" data-preset="#9b1b2a" title="Crimson" onclick="_applyPreset('#9b1b2a')"></button>
+              <span class="settings-preset-label">CRIM</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;">
+              <button class="settings-preset-swatch" style="background:#1a8050;" data-preset="#1a8050" title="Emerald" onclick="_applyPreset('#1a8050')"></button>
+              <span class="settings-preset-label">EMRD</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;">
+              <button class="settings-preset-swatch" style="background:#1a50b0;" data-preset="#1a50b0" title="Cobalt" onclick="_applyPreset('#1a50b0')"></button>
+              <span class="settings-preset-label">CBLT</span>
+            </div>
+          </div>
+        </div>
 
         <div class="settings-row">
           <div>
             <div class="settings-row-label">Beam Light Color</div>
-            <div class="settings-row-sub">Background light shafts — independent of mode. Default: deep red.</div>
+            <div class="settings-row-sub">Background light beams — independent of accent and mode. Default: deep red.</div>
           </div>
           <div class="settings-color-swatch-wrap">
             <input type="color" id="beam-color-input" class="settings-color-input" value="#9b1b2a"
@@ -2556,7 +2781,7 @@ body.light-accent .mode-opt.active .os-btn-inner span{color:#0a0a0a;}
 
         <div class="settings-row">
           <div>
-            <div class="settings-row-label">Reset Beam</div>
+            <div class="settings-row-label">Reset Beam Color</div>
             <div class="settings-row-sub">Return to default deep red</div>
           </div>
           <button class="settings-action-btn" onclick="setBeamColor('#9b1b2a');document.getElementById('beam-color-input').value='#9b1b2a';">RESET</button>
@@ -3118,6 +3343,46 @@ document.addEventListener('touchmove',e=>{if(e.touches.length>1&&!e.target.close
 
 /* ── SCAN LINE ── */
 /* ── ACCENT COLOR — user's chosen system color, independent of mode ── */
+function setAccentColor(hex){
+  // Convert hex → rgb string for CSS custom property
+  const r=parseInt(hex.slice(1,3),16);
+  const g=parseInt(hex.slice(3,5),16);
+  const b=parseInt(hex.slice(5,7),16);
+  if(isNaN(r)||isNaN(g)||isNaN(b))return;
+  const rgb=`rgb(${r},${g},${b})`;
+  document.body.style.setProperty('--mc-color',rgb);
+  LS.set('accentColor',rgb);
+  // White/near-white accents need dark text on filled buttons to stay readable
+  document.body.classList.toggle('light-accent',_isNearWhite(hex));
+  // Update mode dot to reflect new accent
+  const mode=LS.get('mode','control');
+  const dot=document.getElementById('mode-dot');
+  if(dot){
+    dot.style.background=rgb;
+    dot.style.boxShadow=mode==='depth'?`0 0 5px ${rgb}`:`0 0 10px ${rgb}`;
+  }
+  // Sync swatch picker background in settings if open
+  const swatch=document.getElementById('accent-color-swatch');
+  if(swatch)swatch.style.background=rgb;
+  _syncPresetActive(hex);
+}
+
+/* ── PRESET HELPER — applies a preset hex and syncs all UI ── */
+function _applyPreset(hex){
+  setAccentColor(hex);
+  const inp=document.getElementById('accent-color-input');
+  if(inp)inp.value=hex;
+  if(navigator.vibrate)navigator.vibrate(8);
+}
+
+/* ── PRESET ACTIVE STATE — marks the matching preset swatch ── */
+function _syncPresetActive(hex){
+  const norm=hex.toLowerCase();
+  document.querySelectorAll('.settings-preset-swatch').forEach(btn=>{
+    const p=(btn.dataset.preset||'').toLowerCase();
+    btn.dataset.active=(p===norm)?'true':'false';
+  });
+}
 
 /* ── MODE INTELLIGENCE DEFAULTS — seeded once, Rebecca can rewrite them ── */
 function _seedModeIntelligenceIfEmpty(){
@@ -3293,25 +3558,8 @@ const MODE_LABELS={control:'CONTROL',war:'WAR',depth:'DEPTH'};
 // Static hex values — no interpolation. Color snaps instantly inside the transition.
 
 /* ══════════════════════════════════════════════════════════
-   CINEMATIC MODE TRANSITION ENGINE — v40 REBUILD
-   Each transition reads the INCOMING mode's color identity.
-   Color snaps at midpoint — already wearing the new mode's
-   color when the screen returns.
+   CINEMATIC MODE TRANSITION ENGINE — REBUILT
    ══════════════════════════════════════════════════════════ */
-
-/* Pull the RGB triplet for an incoming mode from CSS vars */
-function _getModeRgb(mode){
-  const root=document.documentElement;
-  const varName=mode==='war'?'--color-war':mode==='depth'?'--color-depth':'--color-control';
-  const stored=root.style.getPropertyValue(varName)||getComputedStyle(root).getPropertyValue(varName);
-  const m=stored.trim().match(/(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
-  if(m)return{r:+m[1],g:+m[2],b:+m[3]};
-  // Fallbacks
-  if(mode==='war')  return{r:204,g:38,b:48};
-  if(mode==='depth')return{r:192,g:162,b:96};
-  return{r:176,g:196,b:212};
-}
-
 function _modeTransition(mode,onMidpoint){
   const cv=document.createElement('canvas');
   cv.style.cssText='position:fixed;inset:0;z-index:9999;pointer-events:none;';
@@ -3325,224 +3573,186 @@ function _modeTransition(mode,onMidpoint){
   let midFired=false;
   const fireMid=()=>{if(!midFired){midFired=true;onMidpoint();}};
   const done=()=>cv.remove();
-  const rgb=_getModeRgb(mode);
-  if(mode==='war')_transWar(ctx,W,H,fireMid,done,rgb);
-  else if(mode==='control')_transControl(ctx,W,H,fireMid,done,rgb);
-  else _transDepth(ctx,W,H,fireMid,done,rgb);
+  if(mode==='war')_transWar(ctx,W,H,fireMid,done);
+  else if(mode==='control')_transControl(ctx,W,H,fireMid,done);
+  else _transDepth(ctx,W,H,fireMid,done);
 }
 
-/* ══ WAR TRANSITION v40 ═════════════════════════════════════
-   WEAPON IGNITION.
-   The screen doesn't break. It's broken INTO.
-
-   0–60ms    Silence — a single point of light forms at center.
-             The calm before. Like a targeting laser acquiring.
-   60–280ms  Glass fracture radiates outward from center.
-             50 shards split the screen — each tilts, darkens.
-             Cracks glow with the incoming red.
-   280–420ms Shards ignite — each fills red from the crack inward.
-             The whole screen is fracture and fire.
-   420–460ms FULL BLACKOUT — midpoint fires at 440ms.
-   460–680ms System online — red static burns off center-out.
-             Like a HUD powering up through interference.
-   680–900ms Static clears. Clean. Armed.
-══════════════════════════════════════════════════════════ */
-function _transWar(ctx,W,H,onMid,onDone,rgb){
+/* ══ WAR ═══════════════════════════════════════════════════
+   SYSTEM SEIZURE.
+   The OS doesn't switch modes. It gets taken over.
+   
+   0–70ms    Chromatic aberration tears open — RGB channels split apart
+   70–240ms  Block corruption — screen chunks rip horizontally
+             Intensifies. More blocks. Bigger offsets. Faster.
+   240–330ms  Four hard strobes — black/red/black/red — machine gun
+   330–370ms  BLACKOUT + SNAP ← midpoint fires here
+   370–540ms  Red phosphor static burns off from center out
+   540–640ms  Clear
+*/
+function _transWar(ctx,W,H,onMid,onDone){
   const start=performance.now();
-  const TOTAL=900;
-  const R=rgb.r,G=rgb.g,B=rgb.b;
-  let midFired=false;
-
-  /* ── Pre-generate fracture geometry ── */
-  /* Voronoi-style shards from center-weighted random seeds */
-  const cx=W/2,cy=H/2;
-  const SEEDS=52;
-  const seeds=[];
-  /* Center cluster — denser near impact point */
-  for(let i=0;i<SEEDS;i++){
-    const angle=Math.random()*Math.PI*2;
-    const dist=(i<16?Math.random()*0.28:Math.random()*0.72)*Math.sqrt(W*W+H*H)*0.55;
-    seeds.push({x:cx+Math.cos(angle)*dist,y:cy+Math.sin(angle)*dist});
-  }
-  /* Bound seeds at screen corners so shards fill edge-to-edge */
-  seeds.push({x:0,y:0},{x:W,y:0},{x:W,y:H},{x:0,y:H});
-  seeds.push({x:W/2,y:0},{x:W,y:H/2},{x:W/2,y:H},{x:0,y:H/2});
-
-  /* Build shard polygons via Fortune-style nearest-seed clipping */
-  /* Lightweight approach: for each seed, clip against all perpendicular bisectors */
-  function bisectorClip(poly,sx,sy,ox,oy){
-    /* Sutherland-Hodgman clip against the half-plane closer to (sx,sy) than (ox,oy) */
-    const mx=(sx+ox)/2,my=(sy+oy)/2;
-    const nx=ox-sx,ny=oy-sy; /* normal toward other seed */
-    const out=[];
-    for(let i=0;i<poly.length;i++){
-      const a=poly[i],b=poly[(i+1)%poly.length];
-      const da=(a.x-mx)*nx+(a.y-my)*ny;
-      const db=(b.x-mx)*nx+(b.y-my)*ny;
-      if(da<=0)out.push(a);
-      if((da<0&&db>0)||(da>0&&db<0)){
-        const t=da/(da-db);
-        out.push({x:a.x+t*(b.x-a.x),y:a.y+t*(b.y-a.y)});
-      }
-    }
-    return out;
-  }
-
-  const margin=20;
-  const shards=seeds.slice(0,SEEDS).map((s,si)=>{
-    let poly=[
-      {x:-margin,y:-margin},{x:W+margin,y:-margin},
-      {x:W+margin,y:H+margin},{x:-margin,y:H+margin}
-    ];
-    for(let j=0;j<seeds.length;j++){
-      if(j===si)continue;
-      poly=bisectorClip(poly,s.x,s.y,seeds[j].x,seeds[j].y);
-      if(poly.length<3)break;
-    }
-    if(poly.length<3)return null;
-    /* Distance from center for timing offset */
-    const dist=Math.sqrt((s.x-cx)*(s.x-cx)+(s.y-cy)*(s.y-cy));
-    const maxD=Math.sqrt(W*W+H*H)*0.5;
-    /* Each shard tilts slightly — random small angle */
-    const tiltAngle=(Math.random()-0.5)*0.04;
-    const tiltPivotX=s.x,tiltPivotY=s.y;
-    return{poly,sx:s.x,sy:s.y,dist,normDist:dist/maxD,tiltAngle,tiltPivotX,tiltPivotY,seed:Math.random()};
-  }).filter(Boolean);
-
-  function easeIn(t){return t*t*t;}
-  function easeOut(t){return 1-Math.pow(1-t,3);}
-  function easeInOut(t){return t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
-
-  function drawShard(s,fracP,igniteP,tilt){
-    const poly=s.poly;
-    if(!poly||poly.length<3)return;
-    ctx.save();
-    if(tilt!==0){
-      ctx.translate(s.tiltPivotX,s.tiltPivotY);
-      ctx.rotate(tilt*s.tiltAngle);
-      ctx.translate(-s.tiltPivotX,-s.tiltPivotY);
-    }
-    ctx.beginPath();
-    ctx.moveTo(poly[0].x,poly[0].y);
-    for(let i=1;i<poly.length;i++)ctx.lineTo(poly[i].x,poly[i].y);
-    ctx.closePath();
-
-    if(igniteP>0){
-      /* Shard fills with mode color from crack inward */
-      const fillAlpha=Math.min(1,igniteP*1.4);
-      ctx.fillStyle=`rgba(${R},${G},${B},${fillAlpha})`;
-      ctx.fill();
-      /* Darken the base */
-      ctx.fillStyle=`rgba(0,0,0,${0.55*(1-igniteP)})`;
-      ctx.fill();
-    }else if(fracP>0){
-      /* Shard tilts and darkens */
-      const darkAlpha=fracP*0.7;
-      ctx.fillStyle=`rgba(0,0,0,${darkAlpha})`;
-      ctx.fill();
-    }
-
-    /* Crack lines — always visible once fracture starts */
-    if(fracP>0){
-      const crackAlpha=Math.min(1,fracP*1.8)*(igniteP>0?(0.55+igniteP*0.45):0.75);
-      ctx.strokeStyle=`rgba(${R},${G},${B},${crackAlpha})`;
-      ctx.lineWidth=igniteP>0.5?1.2:0.7;
-      ctx.shadowColor=`rgba(${R},${G},${B},${crackAlpha*0.9})`;
-      ctx.shadowBlur=igniteP>0?12:5;
-      ctx.stroke();
-      ctx.shadowBlur=0;
-    }
-    ctx.restore();
-  }
+  const TOTAL=640;
+  // Pre-generate block positions so they're consistent per frame (not fully random each frame)
+  const blockPool=Array.from({length:60},()=>({
+    y:Math.random()*H,
+    h:Math.random()*22+2,
+    w:Math.random()*W*0.9+W*0.05,
+    x:Math.random()*W*0.1,
+    offset:(Math.random()-.5)*120,
+    type:Math.random()>.6?'white':'red',
+    seed:Math.random()
+  }));
+  let lastBlockRefresh=0;
+  let activeBlocks=blockPool.slice(0,8);
 
   function frame(now){
-    const ms=now-start;
-    const t=Math.min(ms/TOTAL,1);
+    const t=now-start;
+    const p=Math.min(t/TOTAL,1);
     ctx.clearRect(0,0,W,H);
 
-    /* ── Phase 1: Point of light — 0–60ms ── */
-    if(ms<60){
-      const p=ms/60;
-      const r=2+p*8;
-      const grad=ctx.createRadialGradient(cx,cy,0,cx,cy,r*4);
-      grad.addColorStop(0,`rgba(${R},${G},${B},${p*0.9})`);
-      grad.addColorStop(0.4,`rgba(${R},${G},${B},${p*0.3})`);
-      grad.addColorStop(1,'rgba(0,0,0,0)');
-      ctx.fillStyle=grad;
-      ctx.fillRect(0,0,W,H);
-    }
+    if(t<70){
+      /* ── Chromatic aberration buildup ── */
+      const ca=t/70;
+      const offset=ca*18;
+      // Dark base
+      ctx.fillStyle=`rgba(0,0,0,${ca*0.55})`;ctx.fillRect(0,0,W,H);
+      // Red channel bleeds right
+      ctx.globalCompositeOperation='screen';
+      ctx.fillStyle=`rgba(155,0,0,${ca*0.35})`;
+      for(let y=0;y<H;y+=3){
+        if(Math.random()<.6)ctx.fillRect(offset*ca*2,y,W,2);
+      }
+      // Cyan channel bleeds left
+      ctx.fillStyle=`rgba(0,60,120,${ca*0.25})`;
+      for(let y=0;y<H;y+=3){
+        if(Math.random()<.5)ctx.fillRect(-offset*1.2*ca,y,W,2);
+      }
+      ctx.globalCompositeOperation='source-over';
+      // Dark overlay to keep it from being too light
+      ctx.fillStyle=`rgba(0,0,0,${ca*0.4})`;ctx.fillRect(0,0,W,H);
 
-    /* ── Phase 2: Glass fracture — 60–280ms ── */
-    if(ms>=50&&ms<460){
-      const fracMs=Math.max(0,ms-60);
-      const fracTotal=220; /* fracture phase duration */
-      const igniteMs=Math.max(0,ms-260);
-      const igniteTotal=160;
+    }else if(t<240){
+      /* ── Block corruption ── */
+      const gp=(t-70)/170; // 0→1
+      const eased=gp<.5?2*gp*gp:1-Math.pow(-2*gp+2,2)/2;
+      const intensity=eased;
 
-      shards.forEach(s=>{
-        /* Each shard fractures outward with a small delay based on distance */
-        const delay=s.normDist*0.45; /* 0–0.45 normalized delay */
-        const shardFracP=Math.max(0,Math.min(1,easeOut((fracMs/fracTotal-delay)/(1-delay+0.01))));
-        const shardIgniteP=ms>260?Math.max(0,Math.min(1,easeInOut((igniteMs/igniteTotal-delay*0.4)/(1-delay*0.4+0.01)))):0;
-        const tiltAmt=shardFracP*(1-shardIgniteP*0.6);
-        drawShard(s,shardFracP,shardIgniteP,tiltAmt);
+      // Refresh block pool more frequently as intensity rises
+      if(t-lastBlockRefresh>80-intensity*60){
+        lastBlockRefresh=t;
+        const count=Math.floor(4+intensity*24);
+        activeBlocks=Array.from({length:count},()=>blockPool[Math.floor(Math.random()*blockPool.length)]);
+      }
+
+      // Dark veil intensifies
+      ctx.fillStyle=`rgba(0,0,0,${0.45+intensity*0.45})`;ctx.fillRect(0,0,W,H);
+
+      // Displaced blocks
+      activeBlocks.forEach(b=>{
+        const shift=b.offset*intensity*(0.5+b.seed*0.8);
+        if(b.type==='red'){
+          ctx.fillStyle=`rgba(155,27,42,${0.35+intensity*0.55})`;
+          ctx.fillRect(b.x+shift,b.y,b.w,b.h);
+          // Thin white edge on block
+          ctx.fillStyle=`rgba(255,255,255,${intensity*0.5})`;
+          ctx.fillRect(b.x+shift,b.y,b.w,1);
+        }else{
+          // White block — screen tear artifact
+          ctx.fillStyle=`rgba(240,240,255,${0.25+intensity*0.6})`;
+          ctx.fillRect(b.x+shift*.4,b.y+b.h*.3,b.w*.5,Math.max(1,b.h*.2));
+        }
       });
-    }
 
-    /* ── Phase 3: Full blackout — 420–460ms ── */
-    if(ms>=420&&ms<460){
-      const p=(ms-420)/40;
-      ctx.fillStyle=`rgba(0,0,0,${easeIn(p)})`;
-      ctx.fillRect(0,0,W,H);
-    }
-    if(ms>=440&&!midFired){midFired=true;onMid();}
+      // Horizontal scan tears
+      const tears=Math.floor(intensity*16);
+      for(let i=0;i<tears;i++){
+        const ty=Math.random()*H;
+        ctx.fillStyle=`rgba(155,27,42,${0.25+Math.random()*intensity*0.6})`;
+        ctx.fillRect(0,ty,W,Math.random()*2+.5);
+      }
 
-    /* ── Phase 4: Red static burns off center-out — 460–780ms ── */
-    if(ms>=460&&ms<780){
-      const p=easeOut((ms-460)/320);
-      const clearR=p*Math.sqrt(W*W+H*H)*0.65;
+      // Chromatic ghost persists
+      ctx.globalCompositeOperation='screen';
+      ctx.fillStyle=`rgba(100,0,0,${intensity*0.18})`;
+      ctx.fillRect(intensity*14,0,W,H);
+      ctx.fillStyle=`rgba(0,30,80,${intensity*0.12})`;
+      ctx.fillRect(-intensity*8,0,W,H);
+      ctx.globalCompositeOperation='source-over';
 
-      /* Static noise — only outside clear zone */
-      const stride=3;
+      // Text corruption — not words, fragments
+      if(intensity>.55&&Math.random()>.45){
+        ctx.save();
+        ctx.font=`${700} ${7+Math.floor(Math.random()*3)}px "Electrolize",monospace`;
+        ctx.fillStyle=`rgba(255,255,255,${Math.random()*.85+.1})`;
+        ctx.textAlign='center';
+        ctx.globalAlpha=Math.random()*.9+.1;
+        const frags=['OVERRIDE','WAR','BREACH','SEIZE','∎∎∎∎∎','//W//','01001','∴∎∴'];
+        const frag=frags[Math.floor(Math.random()*frags.length)];
+        ctx.fillText(frag,W/2+(Math.random()-.5)*60,H/2+(Math.random()-.5)*80);
+        ctx.restore();
+      }
+
+    }else if(t<330){
+      /* ── Rapid strobe — 4 cuts in 90ms ── */
+      const sp=(t-240)/90;
+      const strobe=Math.floor(sp*8);
+      const isRed=strobe%2===0;
+      if(isRed){
+        ctx.fillStyle='rgba(155,27,42,0.96)';ctx.fillRect(0,0,W,H);
+        // Horizontal tear lines in the red
+        for(let i=0;i<6;i++){
+          const sy=Math.random()*H;
+          ctx.fillStyle=`rgba(255,255,255,${.3+Math.random()*.5})`;
+          ctx.fillRect(0,sy,W,1);
+        }
+      }else{
+        ctx.fillStyle='rgba(0,0,0,0.97)';ctx.fillRect(0,0,W,H);
+      }
+
+    }else if(t<370){
+      /* ── Blackout ── */
+      onMid();
+      ctx.fillStyle='rgba(0,0,0,1)';ctx.fillRect(0,0,W,H);
+
+    }else if(t<540){
+      /* ── Red phosphor static burns off center out ── */
+      const dp=(t-370)/170;
+      const eased=dp*dp; // accelerate outward
+      const clearRadius=eased*Math.sqrt(W*W+H*H)*.7;
+      const cx=W/2,cy=H*.45;
+
+      // Noise fill — only outside the clear radius
+      const stride=2;// skip pixels for perf
       for(let y=0;y<H;y+=stride){
         for(let x=0;x<W;x+=stride){
-          const d=Math.sqrt((x-cx)*(x-cx)+(y-cy)*(y-cy));
-          if(d>clearR&&Math.random()<(1-p)*0.6){
-            const bright=Math.random()>0.6;
-            ctx.fillStyle=bright
-              ?`rgba(${R},${G},${B},${Math.random()*0.85+0.15})`
-              :`rgba(${Math.floor(R*0.3)},${Math.floor(G*0.3)},${Math.floor(B*0.3)},${Math.random()*0.7})`;
+          const dist=Math.sqrt((x-cx)*(x-cx)+(y-cy)*(y-cy));
+          if(dist>clearRadius&&Math.random()<(1-dp)*.55){
+            const isW=Math.random()>.55;
+            ctx.fillStyle=isW
+              ?`rgba(255,230,230,${Math.random()*.7})`
+              :`rgba(155,27,42,${Math.random()*.8})`;
             ctx.fillRect(x,y,stride,stride);
           }
         }
       }
 
-      /* Sweep ring — glowing edge of the clearing zone */
-      if(clearR>0){
-        const rg=ctx.createRadialGradient(cx,cy,Math.max(0,clearR-20),cx,cy,clearR+12);
-        rg.addColorStop(0,'rgba(0,0,0,0)');
-        rg.addColorStop(0.4,`rgba(${R},${G},${B},${(1-p)*0.4})`);
-        rg.addColorStop(0.8,`rgba(255,220,220,${(1-p)*0.55})`);
-        rg.addColorStop(1,'rgba(0,0,0,0)');
-        ctx.fillStyle=rg;ctx.fillRect(0,0,W,H);
-      }
+      // Sweep ring — the leading edge of the clear zone
+      const rg=ctx.createRadialGradient(cx,cy,Math.max(0,clearRadius-18),cx,cy,clearRadius+8);
+      rg.addColorStop(0,'rgba(0,0,0,0)');
+      rg.addColorStop(.5,`rgba(155,27,42,${(1-dp)*.35})`);
+      rg.addColorStop(.85,`rgba(255,150,150,${(1-dp)*.5})`);
+      rg.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=rg;ctx.fillRect(0,0,W,H);
 
-      /* Dark center clears first */
-      const clearGrad=ctx.createRadialGradient(cx,cy,0,cx,cy,clearR*0.88);
-      clearGrad.addColorStop(0,'rgba(0,0,0,0)');
-      clearGrad.addColorStop(1,'rgba(0,0,0,0)');
-      /* already transparent — just masks the static above */
+    }else{
+      /* ── Fade out ── */
+      const fp=(t-540)/(TOTAL-540);
+      const a=Math.max(0,(1-fp)*.18);
+      ctx.fillStyle=`rgba(0,0,0,${a})`;ctx.fillRect(0,0,W,H);
     }
 
-    /* ── Phase 5: Fade clear — 780–900ms ── */
-    if(ms>=780){
-      const p=(ms-780)/120;
-      const a=Math.max(0,(1-p)*0.22);
-      ctx.fillStyle=`rgba(0,0,0,${a})`;
-      ctx.fillRect(0,0,W,H);
-    }
-
-    if(t<1)requestAnimationFrame(frame);else onDone();
+    if(p<1)requestAnimationFrame(frame);else onDone();
   }
   requestAnimationFrame(frame);
 }
@@ -3559,401 +3769,249 @@ function _transWar(ctx,W,H,onMid,onDone,rgb){
    400–560ms  Grid dissolves. System online.
    560–680ms  Clear.
 */
-/* ══ CONTROL TRANSITION v40 ═══════════════════════════════════════
-   TARGETING LOCK.
-   The system doesn't switch. It acquires.
+/* ══ CONTROL TRANSITION ═══════════════════════════════════════════
+   PRECISION LOCK.
+   A targeting system acquiring its mark — technical, exact, fast.
 
-   0–40ms    Three rapid horizontal scan lines sweep full screen,
-             top to bottom in staggered rapid sequence.
-             Cold, precise, clinical.
-   40–220ms  Data grid assembles — fine lines draw from edges inward
-             building a full precision grid. Corner brackets snap
-             into place at the four quadrants.
-   220–380ms Grid collapses — all lines retract to center point.
-             Speed increases as they converge. A targeting implosion.
-   380–440ms LOCK FLASH — single bright crosshair detonates at center.
-             Full white-platinum burst, holds 60ms. Midpoint fires.
-   440–560ms Crosshair burns out — arms fade from center outward.
-             One final scan line exits the bottom.
-   560–700ms Clean. System online.
+   0–80ms    Single horizontal scan line sweeps top → bottom at velocity
+   80–200ms  Reticle grid expands from center — fine lines, geometric
+             Crosshair arms extend outward. System acquiring.
+   200–300ms Grid contracts and collapses to center with sharp snap
+   300–340ms Hard inward implosion → BLACKOUT → midpoint fires
+   340–460ms Reticle re-expands briefly then dissolves
+   460–560ms Interface returns in clean precision
 ══════════════════════════════════════════════════════════════════ */
-function _transControl(ctx,W,H,onMid,onDone,rgb){
+function _transControl(ctx,W,H,onMid,onDone){
   const start=performance.now();
-  const TOTAL=700;
-  const R=rgb.r,G=rgb.g,B=rgb.b;
+  const TOTAL=560;
+  const accentRgb=(()=>{
+    const v=getComputedStyle(document.documentElement).getPropertyValue('--mc-color').trim();
+    const m=v.match(/(\d+),\s*(\d+),\s*(\d+)/);
+    return m?{r:+m[1],g:+m[2],b:+m[3]}:{r:180,g:180,b:180};
+  })();
+  const AC=`${accentRgb.r},${accentRgb.g},${accentRgb.b}`;
   let midFired=false;
 
-  function easeOut(t){return 1-Math.pow(1-t,3);}
-  function easeIn(t){return t*t*t;}
-  function easeInOut(t){return t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
-
-  /* Grid geometry */
-  const COLS=14,ROWS=9;
-  const cx=W/2,cy=H/2;
-
-  function drawGrid(progress,alpha){
-    /* progress 0→1: lines grow from edges to center / collapse to center */
-    ctx.save();
-    ctx.globalAlpha=alpha;
-    ctx.strokeStyle=`rgb(${R},${G},${B})`;
-    ctx.lineWidth=0.5;
-
-    /* Vertical lines grow from top/bottom edges inward */
-    for(let i=0;i<=COLS;i++){
-      const x=W*i/COLS;
-      const reach=progress*H/2;
-      ctx.beginPath();
-      ctx.moveTo(x,cy-reach);
-      ctx.lineTo(x,cy+reach);
-      ctx.stroke();
-    }
-    /* Horizontal lines grow from left/right edges inward */
-    for(let i=0;i<=ROWS;i++){
-      const y=H*i/ROWS;
-      const reach=progress*W/2;
-      ctx.beginPath();
-      ctx.moveTo(cx-reach,y);
-      ctx.lineTo(cx+reach,y);
-      ctx.stroke();
-    }
-    ctx.restore();
-  }
-
-  function drawCornerBrackets(progress,alpha){
-    const size=Math.min(W,H)*0.18*progress;
-    const armLen=size*0.38;
-    const corners=[
-      {x:cx-size,y:cy-size,sx:1,sy:1},
-      {x:cx+size,y:cy-size,sx:-1,sy:1},
-      {x:cx+size,y:cy+size,sx:-1,sy:-1},
-      {x:cx-size,y:cy+size,sx:1,sy:-1},
-    ];
-    ctx.save();
-    ctx.globalAlpha=alpha;
-    ctx.strokeStyle=`rgb(${R},${G},${B})`;
-    ctx.lineWidth=1.5;
-    ctx.shadowColor=`rgba(${R},${G},${B},0.7)`;
-    ctx.shadowBlur=8;
-    corners.forEach(c=>{
-      ctx.beginPath();
-      ctx.moveTo(c.x,c.y+c.sy*armLen);
-      ctx.lineTo(c.x,c.y);
-      ctx.lineTo(c.x+c.sx*armLen,c.y);
-      ctx.stroke();
-    });
-    ctx.restore();
-  }
-
-  function drawCrosshair(progress,alpha,glow){
-    const armLen=Math.min(W,H)*0.35*progress;
-    const gap=14*Math.min(1,progress*3);
-    ctx.save();
-    ctx.globalAlpha=alpha;
-    ctx.strokeStyle=`rgb(${R},${G},${B})`;
-    ctx.lineWidth=1;
-    if(glow){ctx.shadowColor=`rgba(${R},${G},${B},0.9)`;ctx.shadowBlur=16;}
-    /* Four arms */
-    [[0,-gap,0,-armLen],[0,gap,0,armLen],[-gap,0,-armLen,0],[gap,0,armLen,0]].forEach(([x1,y1,x2,y2])=>{
-      ctx.beginPath();ctx.moveTo(cx+x1,cy+y1);ctx.lineTo(cx+x2,cy+y2);ctx.stroke();
-    });
-    /* Center dot */
-    ctx.beginPath();
-    ctx.arc(cx,cy,2*Math.min(1,progress*2),0,Math.PI*2);
-    ctx.fillStyle=`rgb(${R},${G},${B})`;
-    ctx.fill();
-    ctx.restore();
-  }
-
-  function drawScanLine(y,alpha){
-    ctx.save();
-    ctx.globalAlpha=alpha;
-    const grad=ctx.createLinearGradient(0,0,W,0);
-    grad.addColorStop(0,'rgba(0,0,0,0)');
-    grad.addColorStop(0.1,`rgb(${R},${G},${B})`);
-    grad.addColorStop(0.5,`rgb(${R},${G},${B})`);
-    grad.addColorStop(0.9,`rgb(${R},${G},${B})`);
-    grad.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.strokeStyle=grad;
-    ctx.lineWidth=1.2;
-    ctx.shadowColor=`rgba(${R},${G},${B},0.9)`;
-    ctx.shadowBlur=10;
-    ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
-    /* Trailing glow */
-    ctx.globalAlpha=alpha*0.25;
-    ctx.lineWidth=7;
-    ctx.shadowBlur=0;
-    ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
-    ctx.restore();
-  }
-
   function frame(now){
-    const ms=now-start;
-    const t=Math.min(ms/TOTAL,1);
+    const t=Math.min((now-start)/TOTAL,1);
+    const ms=(now-start);
     ctx.clearRect(0,0,W,H);
 
-    /* ── Phase 1: Rapid scan lines — 0–40ms ── */
-    if(ms<40){
-      /* Three scan lines staggered — 0ms, 13ms, 26ms */
-      [0,13,26].forEach((offset,i)=>{
-        const localMs=ms-offset;
-        if(localMs<0||localMs>30)return;
-        const p=localMs/30;
-        const y=H*p;
-        const alpha=0.8*(1-Math.abs(p-0.5)*1.6);
-        if(alpha>0)drawScanLine(y,alpha);
+    /* Phase 1: Scan line sweeps (0–80ms) */
+    if(ms<80){
+      const p=ms/80;
+      const y=H*p;
+      ctx.save();
+      ctx.globalAlpha=0.75*(1-Math.abs(p-0.5)*1.8+0.1);
+      ctx.strokeStyle=`rgb(${AC})`;
+      ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
+      // Trailing glow
+      ctx.globalAlpha=0.2;
+      ctx.lineWidth=6;
+      ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
+      ctx.restore();
+    }
+
+    /* Phase 2: Reticle grid expands (80–200ms) */
+    if(ms>=80&&ms<300){
+      const localT=ms<200?(ms-80)/120:1-(ms-200)/100;
+      const size=Math.min(W,H)*0.65*localT;
+      const cx=W/2,cy=H/2;
+      ctx.save();
+      ctx.globalAlpha=0.55*localT;
+      ctx.strokeStyle=`rgb(${AC})`;
+      ctx.lineWidth=0.8;
+
+      // Four reticle arms extending from center
+      const armLen=size*0.5;
+      const gap=18*localT;
+      // Top arm
+      ctx.beginPath();ctx.moveTo(cx,cy-gap);ctx.lineTo(cx,cy-armLen);ctx.stroke();
+      // Bottom arm
+      ctx.beginPath();ctx.moveTo(cx,cy+gap);ctx.lineTo(cx,cy+armLen);ctx.stroke();
+      // Left arm
+      ctx.beginPath();ctx.moveTo(cx-gap,cy);ctx.lineTo(cx-armLen,cy);ctx.stroke();
+      // Right arm
+      ctx.beginPath();ctx.moveTo(cx+gap,cy);ctx.lineTo(cx+armLen,cy);ctx.stroke();
+
+      // Corner brackets
+      const bSize=16*localT;
+      const bOff=size*0.38;
+      [[cx-bOff,cy-bOff,1,1],[cx+bOff,cy-bOff,-1,1],[cx+bOff,cy+bOff,-1,-1],[cx-bOff,cy+bOff,1,-1]].forEach(([x,y,sx,sy])=>{
+        ctx.beginPath();
+        ctx.moveTo(x,y+sy*bSize);ctx.lineTo(x,y);ctx.lineTo(x+sx*bSize,y);
+        ctx.stroke();
       });
+
+      // Fine grid overlay — subtle, precise
+      ctx.globalAlpha=0.08*localT;
+      ctx.lineWidth=0.5;
+      const cols=12,rows=8;
+      for(let i=1;i<cols;i++){const gx=W*i/cols;ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,H);ctx.stroke();}
+      for(let i=1;i<rows;i++){const gy=H*i/rows;ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(W,gy);ctx.stroke();}
+
+      ctx.restore();
     }
 
-    /* ── Phase 2: Grid assembles — 40–220ms ── */
-    if(ms>=40&&ms<380){
-      const buildP=ms<220?(ms-40)/180:1;
-      const collapseP=ms>=220?easeIn((ms-220)/160):0;
-      const gridP=buildP*(1-collapseP);
-      const bracketP=buildP*(1-collapseP*1.4);
-
-      const gridAlpha=0.12*(1-collapseP*1.2);
-      if(gridAlpha>0)drawGrid(gridP,Math.max(0,gridAlpha));
-
-      if(bracketP>0&&bracketP<1.2)drawCornerBrackets(Math.min(1,bracketP),0.9*(1-collapseP));
-
-      /* Crosshair forms during build phase */
-      if(buildP>0.3){
-        const chP=Math.min(1,(buildP-0.3)/0.7);
-        drawCrosshair(chP*(1-collapseP*1.6),0.65*(1-collapseP*1.4)*chP,false);
-      }
-    }
-
-    /* ── Phase 3: Lock flash — 380–460ms ── */
-    if(ms>=380&&ms<460){
-      const p=(ms-380)/80;
-      const flashAlpha=p<0.35?easeOut(p/0.35)*0.88:easeIn(1-(p-0.35)/0.65)*0.88;
-      /* Full screen tint */
-      ctx.fillStyle=`rgba(${R},${G},${B},${flashAlpha*0.18})`;
+    /* Phase 3: Snap and blackout (300–360ms) */
+    if(ms>=300&&ms<360){
+      const p=(ms-300)/60;
+      // Sharp vignette implodes
+      const grad=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.max(W,H)*0.5*(1-p*0.85));
+      grad.addColorStop(0,'rgba(0,0,0,0)');
+      grad.addColorStop(1,`rgba(0,0,0,${Math.min(p*1.4,1)})`);
+      ctx.fillStyle=grad;
       ctx.fillRect(0,0,W,H);
-      /* Bright crosshair at lock */
-      drawCrosshair(1,flashAlpha,true);
-      /* Corner brackets flash with it */
-      drawCornerBrackets(1,flashAlpha*0.7);
-      if(p>0.3&&!midFired){midFired=true;onMid();}
+      if(p>0.7&&!midFired){midFired=true;onMid();}
     }
-    if(ms>=440&&!midFired){midFired=true;onMid();}
 
-    /* ── Phase 4: Arms burn out, exit scan line — 460–700ms ── */
-    if(ms>=460&&ms<700){
-      const p=(ms-460)/240;
-      /* Crosshair arms fade */
-      const armAlpha=Math.max(0,1-p*1.6)*0.35;
-      if(armAlpha>0)drawCrosshair(1,armAlpha,false);
-      /* Single exit scan line */
-      if(p<0.55){
-        const scanY=cy+H*0.5*(p/0.55);
-        const scanAlpha=0.5*(1-p/0.55);
-        if(scanAlpha>0)drawScanLine(scanY,scanAlpha);
-      }
-      /* Slight screen tint fades to nothing */
-      const tintAlpha=Math.max(0,(1-p*1.4)*0.06);
-      if(tintAlpha>0){
-        ctx.fillStyle=`rgba(${R},${G},${B},${tintAlpha})`;
+    /* Phase 4: Flash and clear (360–560ms) */
+    if(ms>=360&&ms<560){
+      const p=(ms-360)/200;
+      // Brief accent flash then fades to clear
+      const flashAlpha=Math.max(0,0.3-p*0.45);
+      if(flashAlpha>0){
+        ctx.fillStyle=`rgba(${AC},${flashAlpha})`;
         ctx.fillRect(0,0,W,H);
       }
+      // Scan line exits bottom
+      if(p<0.4){
+        const scanY=H*0.5+H*0.5*(p/0.4);
+        ctx.globalAlpha=0.35*(1-p/0.4);
+        ctx.strokeStyle=`rgb(${AC})`;
+        ctx.lineWidth=1;
+        ctx.beginPath();ctx.moveTo(0,scanY);ctx.lineTo(W,scanY);ctx.stroke();
+        ctx.globalAlpha=1;
+      }
     }
 
+    if(!midFired&&ms>=340){midFired=true;onMid();}
     if(t<1)requestAnimationFrame(frame);else onDone();
   }
   requestAnimationFrame(frame);
 }
 
-/* ══ DEPTH TRANSITION v40 ══════════════════════════════════════════
-   THE DESCENT.
-   Shields down. Like stepping into a private room and closing
-   the door. The world doesn't disappear — it just gets quiet.
+/* ══ DEPTH TRANSITION ══════════════════════════════════════════════
+   THE EXHALE.
+   The shields come down. Like a door opening inward — the world
+   outside gets quiet. You breathe out. The interface follows.
 
-   0–180ms   Slow radial darkness breathes outward from center.
-             Warm amber light seeps in at the edges — like candlelight
-             bleeding under a closed door. Everything softens.
-   180–500ms Full depth — the held moment.
-             A single slow pulse at center, like a heartbeat.
-             Particles drift — barely visible, warm.
-             Midpoint fires at 400ms.
-   500–760ms The exhale — darkness recedes from center outward.
-             Amber warmth lingers at edges a moment longer
-             than the darkness, then fades.
-   760–1100ms Clean. Softer. Present.
+   0–300ms   Slow vignette breathes outward from center, soft and dark
+             Like the room getting darker and quieter
+   300–600ms At maximum depth — held for a moment (the held breath)
+             midpoint fires around 520ms
+   600–900ms Slow exhale — the vignette gently recedes
+             Interface returns in quieter, softer clarity
 ══════════════════════════════════════════════════════════════════ */
-function _transDepth(ctx,W,H,onMid,onDone,rgb){
+function _transDepth(ctx,W,H,onMid,onDone){
   const start=performance.now();
-  const TOTAL=1100;
-  const R=rgb.r,G=rgb.g,B=rgb.b;
+  const TOTAL=900;
+  const accentRgb=(()=>{
+    const v=getComputedStyle(document.documentElement).getPropertyValue('--mc-color').trim();
+    const m=v.match(/(\d+),\s*(\d+),\s*(\d+)/);
+    return m?{r:+m[1],g:+m[2],b:+m[3]}:{r:180,g:180,b:180};
+  })();
+  const AC=`${accentRgb.r},${accentRgb.g},${accentRgb.b}`;
   let midFired=false;
 
-  const cx=W/2,cy=H/2;
-  const maxR=Math.sqrt(W*W+H*H)*0.55;
-
-  function easeIn(t){return t*t;}
-  function easeOut(t){return 1-Math.pow(1-t,2);}
+  // Smooth ease — slow in, slow out — the breath
   function easeInOut(t){return t<0.5?2*t*t:1-Math.pow(-2*t+2,2)/2;}
-  function easeInCubic(t){return t*t*t;}
-  function easeOutCubic(t){return 1-Math.pow(1-t,3);}
-
-  /* Pre-generate ambient particles — warm, barely visible */
-  const PARTICLES=28;
-  const particles=Array.from({length:PARTICLES},(_,i)=>{
-    const angle=(i/PARTICLES)*Math.PI*2+(Math.random()-0.5)*0.4;
-    const dist=maxR*(0.12+Math.random()*0.72);
-    return{
-      x:cx+Math.cos(angle)*dist,
-      y:cy+Math.sin(angle)*dist,
-      r:0.6+Math.random()*1.2,
-      baseAlpha:0.04+Math.random()*0.09,
-      drift:{x:(Math.random()-0.5)*0.4,y:(Math.random()-0.5)*0.4},
-      phase:Math.random()*Math.PI*2,
-    };
-  });
-
-  function drawAmbientParticles(progress,ms){
-    ctx.save();
-    particles.forEach((p,i)=>{
-      const breathe=Math.sin(ms*0.002+p.phase)*0.35+0.65;
-      const alpha=p.baseAlpha*progress*breathe;
-      if(alpha<=0)return;
-      const px=p.x+p.drift.x*(ms*0.018);
-      const py=p.y+p.drift.y*(ms*0.018);
-      const grad=ctx.createRadialGradient(px,py,0,px,py,p.r*4);
-      grad.addColorStop(0,`rgba(${R},${G},${B},${alpha})`);
-      grad.addColorStop(1,'rgba(0,0,0,0)');
-      ctx.fillStyle=grad;
-      ctx.beginPath();ctx.arc(px,py,p.r*4,0,Math.PI*2);ctx.fill();
-    });
-    ctx.restore();
-  }
-
-  function drawVignette(innerRatio,outerRatio,alpha){
-    if(alpha<=0)return;
-    const innerR=maxR*innerRatio;
-    const outerR=maxR*outerRatio;
-    const grad=ctx.createRadialGradient(cx,cy,Math.max(0,innerR),cx,cy,outerR);
-    grad.addColorStop(0,'rgba(0,0,0,0)');
-    grad.addColorStop(0.45,`rgba(0,0,0,${alpha*0.38})`);
-    grad.addColorStop(1,`rgba(0,0,0,${alpha})`);
-    ctx.fillStyle=grad;
-    ctx.fillRect(0,0,W,H);
-  }
-
-  function drawEdgeWarmth(alpha){
-    if(alpha<=0)return;
-    /* Warm amber glow at screen edges — like candlelight */
-    const corners=[
-      {x:0,y:0},{x:W,y:0},{x:W,y:H},{x:0,y:H}
-    ];
-    corners.forEach(c=>{
-      const dist=Math.sqrt(W*W+H*H)*0.5;
-      const grad=ctx.createRadialGradient(c.x,c.y,0,c.x,c.y,dist*0.7);
-      grad.addColorStop(0,`rgba(${R},${G},${B},${alpha*0.15})`);
-      grad.addColorStop(0.4,`rgba(${R},${G},${B},${alpha*0.06})`);
-      grad.addColorStop(1,'rgba(0,0,0,0)');
-      ctx.fillStyle=grad;
-      ctx.fillRect(0,0,W,H);
-    });
-  }
-
-  function drawCenterPulse(progress,ms){
-    /* Single slow heartbeat pulse at center */
-    const beat=Math.sin(ms*0.003)*0.5+0.5; /* 0→1 slow oscillation */
-    const r=maxR*0.08*(0.8+beat*0.25)*progress;
-    const alpha=0.055*progress*(0.7+beat*0.3);
-    if(alpha<=0||r<=0)return;
-    const grad=ctx.createRadialGradient(cx,cy,0,cx,cy,r);
-    grad.addColorStop(0,`rgba(${R},${G},${B},${alpha})`);
-    grad.addColorStop(0.5,`rgba(${R},${G},${B},${alpha*0.4})`);
-    grad.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle=grad;
-    ctx.fillRect(0,0,W,H);
-  }
+  function easeIn(t){return t*t*t;}
+  function easeOut(t){return 1-Math.pow(1-t,3);}
 
   function frame(now){
     const ms=now-start;
     const t=Math.min(ms/TOTAL,1);
     ctx.clearRect(0,0,W,H);
 
-    /* ── Phase 1: Breath in — 0–180ms ── */
-    if(ms<180){
-      const p=easeInCubic(ms/180);
-      drawVignette(0.65*(1-p*0.75),1.4,p*0.72);
-      drawEdgeWarmth(p*0.55);
-      drawAmbientParticles(p*0.4,ms);
+    /* Phase 1: Breath in — vignette expands (0–300ms) */
+    if(ms<300){
+      const p=easeIn(ms/300);
+      // Deep, wide vignette — not harsh, soft-edged
+      const innerR=Math.max(W,H)*0.7*(1-p*0.7);
+      const outerR=Math.max(W,H)*1.1;
+      const grad=ctx.createRadialGradient(W/2,H/2,innerR,W/2,H/2,outerR);
+      grad.addColorStop(0,'rgba(0,0,0,0)');
+      grad.addColorStop(0.4,`rgba(0,0,0,${p*0.35})`);
+      grad.addColorStop(1,`rgba(0,0,0,${p*0.72})`);
+      ctx.fillStyle=grad;
+      ctx.fillRect(0,0,W,H);
+
+      // Extremely subtle particles drifting inward — like dust settling
+      ctx.save();
+      const particleCount=Math.floor(22*p);
+      for(let i=0;i<particleCount;i++){
+        const seed=i*2.618;
+        const angle=(seed%1)*Math.PI*2;
+        const dist=Math.max(W,H)*0.3*(0.3+(seed*7%1)*0.7)*(1-p*0.4);
+        const px=W/2+Math.cos(angle)*dist;
+        const py=H/2+Math.sin(angle)*dist;
+        const alpha=0.12*p*(1-(i/particleCount)*0.6);
+        ctx.fillStyle=`rgba(${AC},${alpha})`;
+        ctx.beginPath();
+        ctx.arc(px,py,0.8+(seed*3%1)*1.2,0,Math.PI*2);
+        ctx.fill();
+      }
+      ctx.restore();
     }
 
-    /* ── Phase 2: Held — 180–500ms ── */
-    if(ms>=180&&ms<500){
-      const heldP=(ms-180)/320;
-      /* Vignette pulses very slightly — breathing */
-      const breathe=Math.sin(heldP*Math.PI*1.4)*0.06;
-      drawVignette(0.08,1.4,0.72+breathe);
-      drawEdgeWarmth(0.55+breathe*0.4);
-      drawAmbientParticles(1,ms);
-      drawCenterPulse(1,ms);
-      if(heldP>0.68&&!midFired){midFired=true;onMid();}
+    /* Phase 2: Held (300–620ms) — maximum depth */
+    if(ms>=300&&ms<620){
+      const p=1;
+      // Full vignette held
+      const innerR=Math.max(W,H)*0.18;
+      const outerR=Math.max(W,H)*1.1;
+      const held=(ms-300)/320;
+      const holdAlpha=0.72*(1-easeOut(held)*0.15); // slight pulse
+      const grad=ctx.createRadialGradient(W/2,H/2,innerR,W/2,H/2,outerR);
+      grad.addColorStop(0,'rgba(0,0,0,0)');
+      grad.addColorStop(0.3,`rgba(0,0,0,${holdAlpha*0.4})`);
+      grad.addColorStop(1,`rgba(0,0,0,${holdAlpha})`);
+      ctx.fillStyle=grad;
+      ctx.fillRect(0,0,W,H);
+
+      // A single soft circle at center — like a slow pulse
+      const pulseR=Math.max(W,H)*0.08*(1+Math.sin(held*Math.PI)*0.18);
+      const pulseAlpha=0.06*(1+Math.sin(held*Math.PI)*0.4);
+      const pulseGrad=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,pulseR);
+      pulseGrad.addColorStop(0,`rgba(${AC},${pulseAlpha})`);
+      pulseGrad.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=pulseGrad;
+      ctx.fillRect(0,0,W,H);
+
+      if(held>0.62&&!midFired){midFired=true;onMid();}
     }
 
-    /* ── Phase 3: Exhale — 500–760ms ── */
-    if(ms>=500&&ms<760){
-      const p=easeOutCubic((ms-500)/260);
-      /* Vignette recedes */
-      const vigAlpha=0.72*(1-p*0.95);
-      drawVignette(0.08+p*0.65,1.4,vigAlpha);
-      /* Edge warmth lingers slightly longer */
-      const warmthLinger=Math.max(0,1-p*1.3);
-      drawEdgeWarmth(0.55*warmthLinger);
-      drawAmbientParticles(1-p*0.85,ms);
-      drawCenterPulse(1-p,ms);
-    }
-
-    /* ── Phase 4: Settle — 760–1100ms ── */
-    if(ms>=760){
-      const p=(ms-760)/340;
-      const a=Math.max(0,(1-p*1.4)*0.08);
-      if(a>0){
-        ctx.fillStyle=`rgba(0,0,0,${a})`;
+    /* Phase 3: Exhale — vignette recedes (620–900ms) */
+    if(ms>=620&&ms<TOTAL){
+      const p=easeOut((ms-620)/280);
+      const innerR=Math.max(W,H)*0.18+Math.max(W,H)*0.52*p;
+      const outerR=Math.max(W,H)*1.1;
+      const alpha=0.72*(1-p*0.95);
+      if(alpha>0){
+        const grad=ctx.createRadialGradient(W/2,H/2,innerR,W/2,H/2,outerR);
+        grad.addColorStop(0,'rgba(0,0,0,0)');
+        grad.addColorStop(0.4,`rgba(0,0,0,${alpha*0.35})`);
+        grad.addColorStop(1,`rgba(0,0,0,${alpha})`);
+        ctx.fillStyle=grad;
         ctx.fillRect(0,0,W,H);
       }
     }
 
-    if(!midFired&&ms>=450){midFired=true;onMid();}
+    if(!midFired&&ms>=560){midFired=true;onMid();}
     if(t<1)requestAnimationFrame(frame);else onDone();
   }
   requestAnimationFrame(frame);
-}
-
-/* ── Apply a mode's color identity to the live CSS vars ─────────
-   Called at transition midpoint so the interface shifts color
-   while hidden inside the cinematic. Also called on OS init.
-   Reads per-mode color vars (settable from Settings).
-   ─────────────────────────────────────────────────────────────── */
-function _applyModeColor(mode){
-  const root=document.documentElement;
-  const varName=mode==='war'?'--color-war':mode==='depth'?'--color-depth':'--color-control';
-  const stored=root.style.getPropertyValue(varName)||getComputedStyle(root).getPropertyValue(varName);
-  const m=stored.trim().match(/(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
-  let r,g,b;
-  if(m){r=+m[1];g=+m[2];b=+m[3];}
-  else if(mode==='war'){r=204;g=38;b=48;}
-  else if(mode==='depth'){r=192;g=162;b=96;}
-  else{r=176;g=196;b=212;}
-
-  /* Set the main accent vars */
-  root.style.setProperty('--mc-color',`rgb(${r},${g},${b})`);
-  root.style.setProperty('--beam-rgb',`${r},${g},${b}`);
 }
 
 function applyMode(mode){
   const b=document.body;
 
   _modeTransition(mode,()=>{
-    // MIDPOINT — body class snaps here, hidden inside the transition.
-    // Apply the mode's color identity to --mc-color so the entire
-    // interface shifts color the instant the mode becomes active.
+    // MIDPOINT — body class snaps here, hidden inside the transition
+    // Color is NOT driven by mode — it is the user's chosen accent color
     b.className='mode-'+mode;
-    _applyModeColor(mode);
 
     const volTop=document.getElementById('vol-top');
     if(volTop&&volTop.classList.contains('reveal')){
@@ -3964,9 +4022,10 @@ function applyMode(mode){
 
   const dot=document.getElementById('mode-dot');
   const lbl=document.getElementById('mode-label');
-  // Dot color reflects the current mode's identity color
+  // Dot intensity reflects mode — not color. Color is always the accent.
   if(dot){
-    const dotColor=getComputedStyle(document.documentElement).getPropertyValue('--mc-color').trim()||'rgb(176,196,212)';
+    const accent=LS.get('accentColor','');
+    const dotColor=accent||getComputedStyle(document.documentElement).getPropertyValue('--mc-color').trim()||'rgb(238,238,248)';
     dot.style.background=dotColor;
     dot.style.boxShadow=mode==='depth'
       ?`0 0 5px ${dotColor}`
@@ -4544,7 +4603,7 @@ function drawMetricChart(canvas,key,timeRange,metrics){
   if(maxVal<=minVal)maxVal=minVal+1;
 
   // Mode color
-  const mc=getComputedStyle(document.body).getPropertyValue('--mc-color').trim()||'rgb(180,180,180)';
+  const mc=getComputedStyle(document.body).getPropertyValue('--mc-color').trim()||'rgb(238,238,248)';
   const rgb=mc.startsWith('#')?hexToRgb(mc):mc;
   const cm=rgb.match(/(\d+),\s*(\d+),\s*(\d+)/)||[0,123,47,190];
   const r=parseInt(cm[1]),g=parseInt(cm[2]),b=parseInt(cm[3]);
@@ -4951,7 +5010,7 @@ function renderStateAdjustments(){
         i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
       });
       // Use mc-color CSS variable via computed style
-      const mcColor=getComputedStyle(document.documentElement).getPropertyValue('--mc-color').trim()||'rgb(180,180,180)';
+      const mcColor=getComputedStyle(document.documentElement).getPropertyValue('--mc-color').trim()||'rgb(238,238,248)';
       ctx.strokeStyle=mcColor;ctx.lineWidth=1.2;ctx.stroke();
       // End dot
       const lastX=(vals.length-1)*step;
@@ -5313,8 +5372,20 @@ function openSettings(){
   renderScheduleSettings();
   renderCharacterPanel();
   _updateSettingsStatus();
-  // Sync per-mode color pickers with stored values
-  _loadModeColors();
+  // Sync accent color picker with current saved value
+  const accentInput=document.getElementById('accent-color-input');
+  const accentSwatch=document.getElementById('accent-color-swatch');
+  if(accentInput||accentSwatch){
+    const savedRgb=LS.get('accentColor','rgb(238,238,248)');
+    // Convert rgb() to hex for the color input
+    const m=savedRgb.match(/(\d+),\s*(\d+),\s*(\d+)/);
+    if(m){
+      const hex='#'+[m[1],m[2],m[3]].map(v=>parseInt(v).toString(16).padStart(2,'0')).join('');
+      if(accentInput)accentInput.value=hex;
+      if(accentSwatch)accentSwatch.style.background=savedRgb;
+      _syncPresetActive(hex);
+    }
+  }
   // Sync beam color picker with current saved value
   const beamInput=document.getElementById('beam-color-input');
   if(beamInput){
@@ -5553,16 +5624,16 @@ function _renderRevenueArc(revTotal,target,net,targetPct,fmt){
   <svg class="ops-arc-svg" viewBox="0 0 200 136" fill="none" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <filter id="arc-glow" x="-40%" y="-40%" width="180%" height="180%">
-        <feGaussianBlur stdDeviation="2.5" result="blur"/>
+        <feGaussianBlur stdDeviation="3.5" result="blur"/>
         <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
       </filter>
       <linearGradient id="arc-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="var(--mc-color)" stop-opacity="0.45"/>
+        <stop offset="0%" stop-color="var(--mc-color)" stop-opacity="0.55"/>
         <stop offset="100%" stop-color="var(--mc-color)" stop-opacity="1"/>
       </linearGradient>
     </defs>
     <!-- Track -->
-    <path d="${trackPath}" stroke="rgba(240,237,232,0.06)" stroke-width="7" stroke-linecap="round" fill="none"/>
+    <path d="${trackPath}" stroke="rgba(240,237,232,0.10)" stroke-width="7" stroke-linecap="round" fill="none"/>
     <!-- Fill -->
     ${fillPath?`<path d="${fillPath}" stroke="url(#arc-grad)" stroke-width="7" stroke-linecap="round" fill="none" filter="url(#arc-glow)" opacity="${pct>0?1:0}"/>`:''}
     <!-- Tick marks -->
@@ -5571,7 +5642,7 @@ function _renderRevenueArc(revTotal,target,net,targetPct,fmt){
       const inner=polarToXY(a,R-7);
       const outer=polarToXY(a,R+7);
       const active=t<=pct;
-      return`<line x1="${inner.x.toFixed(1)}" y1="${inner.y.toFixed(1)}" x2="${outer.x.toFixed(1)}" y2="${outer.y.toFixed(1)}" stroke="${active?'var(--mc-color)':'rgba(240,237,232,0.12)'}" stroke-width="${t===0||t===1?1.5:0.8}" opacity="${active?0.9:0.5}"/>`;
+      return`<line x1="${inner.x.toFixed(1)}" y1="${inner.y.toFixed(1)}" x2="${outer.x.toFixed(1)}" y2="${outer.y.toFixed(1)}" stroke="${active?'var(--mc-color)':'rgba(240,237,232,0.18)'}" stroke-width="${t===0||t===1?1.5:0.8}" opacity="${active?0.9:0.55}"/>`;
     }).join('')}
     <!-- Center: revenue -->
     <text x="${CX}" y="${CY-14}" text-anchor="middle" font-family="Electrolize,sans-serif" font-size="6" letter-spacing="4" fill="rgba(240,237,232,0.35)" text-transform="uppercase">REVENUE</text>
@@ -7220,65 +7291,10 @@ function _isNearWhite(hex){
   return r>=235&&g>=235&&b>=235;
 }
 
-/* ── PER-MODE COLOR SYSTEM ────────────────────────────────────────
-   Each mode has its own color identity stored as an R,G,B triplet
-   in CSS custom properties and in LS for persistence.
-   ─────────────────────────────────────────────────────────────── */
-const MODE_COLOR_DEFAULTS={
-  control:{r:176,g:196,b:212,hex:'#b0c4d4'},
-  depth:  {r:192,g:162,b:96, hex:'#c0a260'},
-  war:    {r:204,g:38, b:48, hex:'#cc2630'},
-};
-
-function setModeColor(mode,hex){
-  const r=parseInt(hex.slice(1,3),16);
-  const g=parseInt(hex.slice(3,5),16);
-  const b=parseInt(hex.slice(5,7),16);
-  if(isNaN(r)||isNaN(g)||isNaN(b))return;
-  const triplet=`${r},${g},${b}`;
-  const varName=`--color-${mode}`;
-  document.documentElement.style.setProperty(varName,triplet);
-  LS.set(`modeColor_${mode}`,triplet);
-  /* Update swatch background */
-  const swatch=document.getElementById(`color-${mode}-swatch`);
-  if(swatch)swatch.style.background=hex;
-  /* If this is the active mode, apply immediately */
-  if(LS.get('mode','control')===mode){
-    _applyModeColor(mode);
-  }
-}
-
-function resetModeColors(){
-  ['control','depth','war'].forEach(mode=>{
-    const def=MODE_COLOR_DEFAULTS[mode];
-    document.documentElement.style.setProperty(`--color-${mode}`,`${def.r},${def.g},${def.b}`);
-    LS.set(`modeColor_${mode}`,`${def.r},${def.g},${def.b}`);
-    const input=document.getElementById(`color-${mode}-input`);
-    const swatch=document.getElementById(`color-${mode}-swatch`);
-    if(input)input.value=def.hex;
-    if(swatch)swatch.style.background=def.hex;
-  });
-  _applyModeColor(LS.get('mode','control'));
-}
-
-function _loadModeColors(){
-  ['control','depth','war'].forEach(mode=>{
-    const def=MODE_COLOR_DEFAULTS[mode];
-    const stored=LS.get(`modeColor_${mode}`,`${def.r},${def.g},${def.b}`);
-    document.documentElement.style.setProperty(`--color-${mode}`,stored);
-    /* Sync picker UI */
-    const m=stored.match(/(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
-    if(m){
-      const hex='#'+[+m[1],+m[2],+m[3]].map(v=>v.toString(16).padStart(2,'0')).join('');
-      const input=document.getElementById(`color-${mode}-input`);
-      const swatch=document.getElementById(`color-${mode}-swatch`);
-      if(input)input.value=hex;
-      if(swatch)swatch.style.background=hex;
-    }
-  });
-}
-
-
+/* ── Beam light color — independent of accent color and mode ──
+   Stored as an "R,G,B" triplet (no rgb() wrapper) for use inside
+   rgba(var(--beam-rgb), alpha) in the .vol-* gradients. */
+function setBeamColor(hex){
   const r=parseInt(hex.slice(1,3),16);
   const g=parseInt(hex.slice(3,5),16);
   const b=parseInt(hex.slice(5,7),16);
@@ -8648,15 +8664,27 @@ function _sigWave(state){
     // Settings is reflected immediately, with no mode dependency.
     const accentStr=getComputedStyle(document.body).getPropertyValue('--mc-color').trim();
     const am=accentStr.match(/(\d+),\s*(\d+),\s*(\d+)/);
-    const rgb=am?{r:+am[1],g:+am[2],b:+am[3]}:{r:180,g:180,b:180};
+    const rgb=am?{r:+am[1],g:+am[2],b:+am[3]}:{r:238,g:238,b:248};
+
+    // Off state: precision flat line — system at rest, alive and ready
+    if(state==='off'){
+      const ly=H/2;
+      ctx.shadowBlur=3;
+      ctx.shadowColor=`rgba(${rgb.r},${rgb.g},${rgb.b},0.28)`;
+      ctx.strokeStyle=`rgba(${rgb.r},${rgb.g},${rgb.b},0.22)`;
+      ctx.lineWidth=0.8;
+      ctx.beginPath();ctx.moveTo(10,ly);ctx.lineTo(W-10,ly);ctx.stroke();
+      _sigWaveRAF=requestAnimationFrame(draw);
+      return;
+    }
+
     const isActive=state==='recording'||state==='speaking';
     const blur=isActive?16:state==='thinking'?10:4;
     ctx.shadowBlur=blur;
     for(let i=0;i<bars;i++){
       const x=(i/bars)*W+(W/bars)*0.29;
       let bh=2,alpha=0.07;
-      if(state==='off'){bh=2;alpha=0.06;}
-      else if(state==='ready'){bh=H*0.05+Math.abs(Math.sin(_sigWavePhase+i*0.52))*H*0.06;alpha=0.2;}
+      if(state==='ready'){bh=H*0.05+Math.abs(Math.sin(_sigWavePhase+i*0.52))*H*0.06;alpha=0.28;}
       else if(state==='recording'){
         if(_sigAna){
           const fd=new Uint8Array(_sigAna.frequencyBinCount);
@@ -9571,19 +9599,23 @@ function updateSigilRing(){
 /* ── INIT ── */
 function _osInit(){
   const mode=LS.get('mode','control');
-  // Load per-mode color identities from storage
-  _loadModeColors();
-  // Apply the current mode's color immediately
-  _applyModeColor(mode);
+  // Accent color is independent of mode — load user's chosen color or default grey
+  const accent=LS.get('accentColor','rgb(238,238,248)');
+  document.body.style.setProperty('--mc-color',accent);
   document.body.className='mode-'+mode;
-  // Beam light color — independent of mode. Default: deep red.
+  // White/near-white accents need dark text on filled buttons to stay readable
+  const accentM=accent.match(/(\d+),\s*(\d+),\s*(\d+)/);
+  if(accentM){
+    const[ar,ag,ab]=[+accentM[1],+accentM[2],+accentM[3]];
+    document.body.classList.toggle('light-accent',ar>=235&&ag>=235&&ab>=235);
+  }
+  // Beam light color — independent of mode and accent. Default: deep red.
   document.documentElement.style.setProperty('--beam-rgb',LS.get('beamColor','155,27,42'));
   const dot=document.getElementById('mode-dot');
   const lbl=document.getElementById('mode-label');
-  const mcColor=getComputedStyle(document.documentElement).getPropertyValue('--mc-color').trim();
   if(dot){
-    dot.style.background=mcColor;
-    dot.style.boxShadow=mode==='depth'?`0 0 5px ${mcColor}`:`0 0 10px ${mcColor}`;
+    dot.style.background=accent;
+    dot.style.boxShadow=mode==='depth'?`0 0 5px ${accent}`:`0 0 10px ${accent}`;
     dot.style.opacity=mode==='depth'?'0.55':'1';
   }
   if(lbl){lbl.textContent=MODE_LABELS[mode];lbl.style.opacity=mode==='depth'?'0.72':'1';}
