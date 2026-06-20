@@ -1,0 +1,2803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BlaqScale</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Cinzel:wght@400;600;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root { --black:#000; --red:#9B1B2A; --white:#F0EDE8; }
+
+html, body { width:100%; height:100%; overflow:hidden; background:var(--black); color:var(--white); font-family:'Cormorant Garamond',serif; -webkit-font-smoothing:antialiased; }
+
+/* ── 3D PERSPECTIVE GRID ── */
+#grid-canvas { position:fixed; inset:0; width:100%; height:100%; z-index:0; pointer-events:none; opacity:0; animation:topGlowReveal 3s ease forwards 1.2s; }
+
+.grid-fog { position:fixed; inset:0; pointer-events:none; z-index:1; background:linear-gradient(to bottom, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 22%, transparent 48%); }
+
+/* ── PERSISTENT OVERLAYS ── */
+.vignette { position:fixed; inset:0; pointer-events:none; z-index:99; background:radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.55) 100%); contain:strict; }
+
+
+
+
+/* ── INIT SCAN LINE ── */
+#scan-line {
+  position:fixed; left:0; right:0; height:1px;
+  background:linear-gradient(90deg, transparent 0%, rgba(155,27,42,0.6) 20%, rgba(196,18,48,0.9) 50%, rgba(155,27,42,0.6) 80%, transparent 100%);
+  box-shadow:0 0 12px rgba(155,27,42,0.8), 0 0 24px rgba(155,27,42,0.3);
+  pointer-events:none; z-index:150;
+  top:0; opacity:0; will-change:transform,opacity;
+}
+#scan-line.run {
+  animation:scanDown 1.4s cubic-bezier(0.4,0,0.6,1) forwards;
+}
+@keyframes scanDown {
+  0%   { transform:translateY(0);    opacity:0; }
+  5%   { opacity:1; }
+  95%  { opacity:1; }
+  100% { transform:translateY(100vh); opacity:0; }
+}
+
+
+/* ── VIEW SYSTEM ── */
+.view { position:fixed; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.8s ease; z-index:10; height:calc(var(--vh,1vh)*100); content-visibility:auto; }
+.view.active { opacity:1; pointer-events:all; content-visibility:visible; }
+
+
+/* ── SMALL LOGO — top right corner (shown on main/ready/notready) ── */
+.corner-logo { position:fixed; top:16px; right:16px; z-index:50; opacity:0; pointer-events:none; transition:opacity 0.6s ease; }
+.corner-logo.visible { opacity:1; pointer-events:all; }
+.corner-logo img { width:38px; height:38px; object-fit:contain; display:block; filter:drop-shadow(0 0 6px rgba(155,27,42,0.4));
+  -webkit-mask-image:radial-gradient(ellipse 68% 68% at 50% 50%, black 30%, transparent 100%);
+  mask-image:radial-gradient(ellipse 68% 68% at 50% 50%, black 30%, transparent 100%);
+}
+
+/* ── BACK BUTTON ── */
+.btn-back {
+  position:fixed; top:16px; left:16px; z-index:50;
+  display:none; align-items:center; gap:10px;
+  font-family:'Cinzel',serif; font-size:9px; letter-spacing:0.45em;
+  color:rgba(240,237,232,0.35); cursor:pointer;
+  background:transparent; border:none; outline:none;
+  transition:color 0.3s ease;
+  padding:8px 0;
+}
+.btn-back.visible { display:flex; }
+.btn-back:hover { color:var(--white); }
+.btn-back-arrow { width:16px; height:1px; background:rgba(155,27,42,0.6); position:relative; transition:background 0.3s ease; }
+.btn-back-arrow::before { content:''; position:absolute; left:0; top:-3px; width:6px; height:6px; border-left:1px solid rgba(155,27,42,0.6); border-bottom:1px solid rgba(155,27,42,0.6); transform:rotate(45deg); transition:border-color 0.3s ease; }
+.btn-back:hover .btn-back-arrow { background:var(--red); }
+.btn-back:hover .btn-back-arrow::before { border-color:var(--red); }
+
+/* ════════════════════════════════════════
+   INTRO VIEW
+════════════════════════════════════════ */
+#view-intro { display:flex; z-index:20; }
+
+.intro-ambient {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:70vw; height:70vw; max-width:600px; max-height:600px;
+  background:radial-gradient(ellipse, rgba(155,27,42,0.1) 0%, transparent 65%);
+  pointer-events:none; animation:ambBreathe 5s ease-in-out infinite;
+}
+@keyframes ambBreathe { 0%,100%{opacity:.25;transform:translate(-50%,-50%) scale(.96)} 50%{opacity:.5;transform:translate(-50%,-50%) scale(1.04)} }
+
+.intro-logo-wrap {
+  width:clamp(200px,55vw,300px); height:clamp(200px,55vw,300px);
+  margin:0 auto 20px; position:relative; z-index:1;
+  opacity:0; animation:logoReveal 1s ease forwards 0.25s;
+}
+.intro-logo-wrap::after {
+  content:''; position:absolute; inset:-30px;
+  background:radial-gradient(ellipse, rgba(155,27,42,0.2) 0%, transparent 65%);
+  opacity:0; animation:glowPulse 3s ease-in-out infinite 2.5s;
+}
+@keyframes glowPulse { 0%,100%{opacity:0} 50%{opacity:1} }
+@keyframes logoReveal { 0%{opacity:0;transform:translateY(10px)} 100%{opacity:1;transform:translateY(0)} }
+.intro-logo-wrap img { width:100%; height:100%; object-fit:contain; display:block; position:relative; z-index:1;
+  -webkit-mask-image:radial-gradient(ellipse 72% 72% at 50% 50%, black 38%, transparent 100%);
+  mask-image:radial-gradient(ellipse 72% 72% at 50% 50%, black 38%, transparent 100%);
+}
+
+/* ── LOGO FRAME — corner brackets ── */
+.logo-frame {
+  position:absolute; inset:-14px; pointer-events:none; z-index:2;
+}
+.logo-frame span {
+  position:absolute; width:18px; height:18px; opacity:0;
+}
+.logo-frame span:nth-child(1) { top:0; left:0;     border-top:1px solid var(--red); border-left:1px solid var(--red);  animation:bracketReveal 0.5s ease forwards 0.85s; }
+.logo-frame span:nth-child(2) { top:0; right:0;    border-top:1px solid var(--red); border-right:1px solid var(--red); animation:bracketReveal 0.5s ease forwards 1.0s; }
+.logo-frame span:nth-child(3) { bottom:0; left:0;  border-bottom:1px solid var(--red); border-left:1px solid var(--red);  animation:bracketReveal 0.5s ease forwards 1.15s; }
+.logo-frame span:nth-child(4) { bottom:0; right:0; border-bottom:1px solid var(--red); border-right:1px solid var(--red); animation:bracketReveal 0.5s ease forwards 1.3s; }
+@keyframes bracketReveal { 0%{opacity:0;transform:scale(0.5)} 100%{opacity:1;transform:scale(1)} }
+.logo-frame span { animation-fill-mode:forwards; }
+
+/* ── TOP CORNER GLOW ── */
+.vol-top {
+  position:fixed; top:0; left:0; right:0; height:85vh;
+  pointer-events:none; z-index:1;
+  opacity:0;
+}
+.vol-top.reveal { animation: topGlowReveal 2.5s ease forwards; }
+@keyframes topGlowReveal { 0%{opacity:0} 100%{opacity:1} }
+
+.vol-beam {
+  position:absolute; inset:0;
+  will-change:transform, opacity;
+  transform-origin: top center;
+  contain:strict;
+}
+
+/* Left — wide ceiling spread */
+.vol-l {
+  background:radial-gradient(ellipse 110% 90% at 12% 0%,
+    rgba(155,27,42,0.48) 0%,
+    rgba(120,15,25,0.18) 42%,
+    transparent 68%);
+  animation:shaftL 9s ease-in-out infinite;
+  transform-origin: top left;
+}
+/* Left bright core */
+.vol-l2 {
+  background:radial-gradient(ellipse 55% 70% at 4% 0%,
+    rgba(180,20,35,0.38) 0%,
+    rgba(140,18,30,0.12) 52%,
+    transparent 70%);
+  animation:shaftL 9s ease-in-out infinite 0.5s;
+  transform-origin: top left;
+}
+/* Right — wide ceiling spread */
+.vol-r {
+  background:radial-gradient(ellipse 55% 70% at 88% 0%,
+    rgba(120,15,25,0.18) 0%,
+    rgba(100,12,20,0.06) 42%,
+    transparent 68%);
+  animation:shaftR 11s ease-in-out infinite 1.3s;
+  transform-origin: top right;
+}
+/* Right bright core */
+.vol-r2 {
+  background:radial-gradient(ellipse 25% 45% at 94% 0%,
+    rgba(155,27,42,0.12) 0%,
+    rgba(120,15,25,0.04) 52%,
+    transparent 70%);
+  animation:shaftR 11s ease-in-out infinite 1.8s;
+  transform-origin: top right;
+}
+/* Centre ambient ceiling bleed */
+.vol-c {
+  background:radial-gradient(ellipse 85% 40% at 50% 0%,
+    rgba(130,20,30,0.09) 0%,
+    transparent 78%);
+  animation:shaftBreath 7s ease-in-out infinite 0.8s;
+  transform-origin: top center;
+}
+
+@keyframes shaftL {
+  0%,100% { transform:translateX(0)    scaleX(1);    opacity:0.7;  }
+  25%     { transform:translateX(0)    scaleX(1.1);  opacity:1;    }
+  55%     { transform:translateX(-2%)  scaleX(0.92); opacity:0.42; }
+  80%     { transform:translateX(0)    scaleX(1.05); opacity:0.8;  }
+}
+@keyframes shaftR {
+  0%,100% { transform:translateX(0)    scaleX(1);    opacity:0.75; }
+  30%     { transform:translateX(0)    scaleX(1.1);  opacity:0.42; }
+  60%     { transform:translateX(0)    scaleX(0.9);  opacity:1;    }
+  85%     { transform:translateX(0)    scaleX(1.06); opacity:0.65; }
+}
+@keyframes shaftBreath {
+  0%,100% { transform:scaleY(0.92) scaleX(1);    opacity:0.45; }
+  50%     { transform:scaleY(1.08) scaleX(1.05); opacity:0.9;  }
+}
+
+.intro-brand {
+  font-family:'Cinzel',serif; font-size:clamp(12px,3vw,15px);
+  letter-spacing:0.6em; color:var(--red); margin-bottom:48px;
+  opacity:0; animation:fadeUp 1s ease forwards 1.4s; position:relative; z-index:1;
+}
+
+/* ENTER BUTTON */
+.btn-enter {
+  position:relative; z-index:1;
+  font-family:'Cinzel',serif; font-size:clamp(10px,2.5vw,12px);
+  letter-spacing:0.55em; padding:0;
+  background:transparent; border:none; cursor:pointer;
+  opacity:0; animation:fadeUp 1s ease forwards 2s; outline:none;
+  margin-top:28px;
+}
+.btn-enter-inner {
+  display:flex; align-items:center; justify-content:center;
+  padding:20px 64px;
+  border:1px solid rgba(155,27,42,0.5); color:var(--white);
+  position:relative; overflow:hidden;
+  transition:border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.btn-enter-inner::before {
+  content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+  background:var(--red); transform:scaleY(0); transform-origin:bottom;
+  transition:transform 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+.btn-enter-inner::after {
+  content:''; position:absolute; inset:0; background:var(--red);
+  transform:translateY(101%); transition:transform 0.4s cubic-bezier(0.16,1,0.3,1); z-index:0;
+}
+.btn-enter-inner span { position:relative; z-index:1; }
+.btn-enter:hover .btn-enter-inner { border-color:var(--red); box-shadow:0 0 40px rgba(155,27,42,0.4), 0 0 80px rgba(155,27,42,0.15); }
+.btn-enter:hover .btn-enter-inner::before { transform:scaleY(1); }
+.btn-enter:hover .btn-enter-inner::after  { transform:translateY(0); }
+
+
+/* ════════════════════════════════════════
+   MAIN VIEW — SNAP SCROLL
+════════════════════════════════════════ */
+#view-main { display:flex; visibility:hidden; z-index:10; padding:0; overflow:hidden; }
+#view-main.active { visibility:visible; }
+
+.snap-container {
+  height:calc(var(--vh,1vh)*100); width:100%;
+  overflow-y:scroll; scroll-snap-type:y mandatory;
+  -webkit-overflow-scrolling:touch; scrollbar-width:none;
+}
+.snap-container::-webkit-scrollbar { display:none; }
+
+.snap-section {
+  height:calc(var(--vh,1vh)*100); scroll-snap-align:start; scroll-snap-stop:always;
+  display:flex; flex-direction:column;
+  align-items:flex-start; justify-content:center;
+  position:relative; padding:40px clamp(24px,6vw,80px);
+}
+
+/* Hero section — centered */
+#s0 { align-items:center; justify-content:flex-start; padding-top:clamp(70px,12vh,160px); text-align:center; overflow:hidden; }
+
+.snap-inner {
+  max-width:620px; width:100%;
+  opacity:0; transform:translateY(28px);
+  transition:opacity 0.85s ease, transform 0.85s cubic-bezier(0.16,1,0.3,1);
+  will-change:transform, opacity;
+}
+.snap-inner.visible { opacity:1; transform:translateY(0); }
+
+/* Force hero inner centered */
+#i0 { text-align:center; display:flex; flex-direction:column; align-items:center; }
+
+/* ── HERO — NO logo-wrap (logo removed from here) ── */
+.brand {
+  font-family:'Cinzel',serif; font-size:clamp(12px,3vw,15px);
+  letter-spacing:0.6em; color:var(--red); margin-bottom:32px; display:block;
+  -webkit-text-stroke:0.4px var(--red);
+}
+
+.hero-headline { font-weight:300; font-size:clamp(54px,14vw,86px); line-height:1.02; margin-bottom:32px; }
+.hero-headline .line { display:block; overflow:hidden; }
+.hero-headline .line span { display:block; }
+.hero-headline .line:nth-child(1) span { animation:lineReveal 1s cubic-bezier(0.16,1,0.3,1) forwards 0.3s; opacity:0; transform:translateY(105%); }
+.hero-headline .line:nth-child(2) span { color:var(--red); font-style:italic; animation:lineReveal 1s cubic-bezier(0.16,1,0.3,1) forwards 0.55s; opacity:0; transform:translateY(105%); }
+@keyframes lineReveal { to{opacity:1;transform:translateY(0)} }
+
+.portrait-wrap {
+  position:relative; width:clamp(180px,52vw,280px); margin:36px auto 0;
+  opacity:0; animation:fadeIn 2.4s ease forwards 0.4s;
+}
+@keyframes fadeIn { 0%{opacity:0} 100%{opacity:1} }
+.portrait-wrap::before {
+  content:''; position:absolute; inset:-1px; opacity:0;
+  animation:borderReveal 1.2s ease forwards 2s;
+  background:linear-gradient(var(--black),var(--black)) padding-box, linear-gradient(180deg,rgba(155,27,42,0.7) 0%,transparent 65%) border-box;
+  border:1px solid transparent;
+  -webkit-mask:linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite:destination-out; mask-composite:exclude;
+}
+@keyframes borderReveal { to{opacity:1} }
+.portrait-wrap::after {
+  content:''; position:absolute; bottom:-28px; left:50%; transform:translateX(-50%);
+  width:90%; height:50px;
+  background:radial-gradient(ellipse, rgba(196,18,48,0.7) 0%, transparent 70%);
+  opacity:0; filter:blur(10px);
+  animation:glowFadeIn 2.5s ease forwards 2s, glowBreath 6s ease-in-out infinite 4.5s;
+}
+@keyframes glowFadeIn { 0%{opacity:0} 100%{opacity:0.7} }
+@keyframes glowBreath { 0%,100%{opacity:.7} 50%{opacity:1} }
+.portrait-wrap img { width:100%; display:block; object-fit:cover; object-position:center top;
+  -webkit-mask-image:linear-gradient(to bottom, black 80%, transparent 100%);
+  mask-image:linear-gradient(to bottom, black 80%, transparent 100%);
+}
+.portrait-scanlines { position:absolute; inset:0; background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.04) 3px,rgba(0,0,0,.04) 4px); pointer-events:none; opacity:.6; }
+
+.founder {
+  font-size:clamp(16px,4vw,20px); font-weight:300; font-style:italic;
+  color:rgba(240,237,232,.45); line-height:1.8; margin-top:28px;
+  text-align:center; width:100%;
+}
+.founder strong { color:var(--white); font-style:normal; font-weight:400; }
+
+.accent-line {
+  width:36px; height:1px; background:var(--red); margin:28px auto 0;
+  opacity:0; transform:scaleX(0);
+  animation:accentReveal .8s ease forwards 0.8s, accentPulse 3s ease-in-out infinite 2s;
+}
+@keyframes accentReveal { to{opacity:1;transform:scaleX(1)} }
+@keyframes accentPulse { 0%,100%{transform:scaleX(1);opacity:1} 40%{transform:scaleX(1.6);opacity:.5} 65%{transform:scaleX(.8);opacity:1} }
+
+
+
+/* ── CONTENT SECTIONS — LEFT ALIGNED ── */
+.section-label { font-family:'Cinzel',serif; font-size:clamp(9px,2vw,10px); letter-spacing:.5em; color:var(--red); margin-bottom:30px; display:block; opacity:1; -webkit-text-stroke:0.4px var(--red); }
+.statement { font-size:clamp(38px,10vw,56px); font-weight:300; line-height:1.08; margin-bottom:36px; text-align:left; }
+.statement em { font-style:italic; color:var(--red); }
+.body-text { font-size:clamp(19px,4.5vw,21px); font-weight:300; line-height:1.85; color:rgba(240,237,232,.55); margin-bottom:16px; text-align:left; position:relative; }
+.body-text strong { color:var(--white); font-weight:400; }
+
+/* ── DATA REVEAL ── */
+.rc { color:transparent; }
+.rc.v { color:inherit; }
+.cmd-cursor {
+  position:absolute; pointer-events:none;
+  color:rgba(240,237,232,0.75);
+  font-size:inherit; line-height:inherit;
+  font-family:inherit; font-weight:300;
+  animation:cursorBlink 0.45s step-end infinite;
+  display:none;
+}
+@keyframes cursorBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+.serve-text { font-family:'Cinzel',serif; font-size:clamp(13px,3vw,15px); letter-spacing:.3em; line-height:2.4; color:rgba(240,237,232,.35); text-align:left; }
+.serve-text strong { color:var(--white); }
+
+.divider-line {
+  display:block; height:1px; margin-bottom:32px; width:100%;
+  background:linear-gradient(90deg,rgba(155,27,42,.95) 0%,rgba(155,27,42,.15) 50%,transparent 100%);
+  transform:scaleX(0); transform-origin:left; opacity:0;
+  transition:transform 1.2s cubic-bezier(.16,1,.3,1) 0.2s, opacity .8s ease 0.2s;
+}
+.snap-inner.visible .divider-line { transform:scaleX(1); opacity:1; }
+
+/* Decision section divider draws from center */
+#i4 .divider-line {
+  transform-origin:center;
+  background:linear-gradient(90deg, transparent 0%, rgba(155,27,42,.5) 30%, rgba(155,27,42,.95) 50%, rgba(155,27,42,.5) 70%, transparent 100%);
+}
+
+/* ── DECISION BUTTON PULSE RINGS ── */
+.btn-pulse-ring {
+  position:absolute; inset:-6px; pointer-events:none; z-index:0;
+}
+.btn-pulse-ring::before,
+.btn-pulse-ring::after {
+  content:''; position:absolute; inset:0;
+  border:1px solid transparent;
+  animation:none;
+}
+/* Red pulse for THIS IS FOR ME */
+#btn-yes .btn-pulse-ring::before {
+  border-color:rgba(155,27,42,0.7);
+  animation:pulseSweepRed 2.4s ease-in-out infinite;
+}
+#btn-yes .btn-pulse-ring::after {
+  border-color:rgba(196,18,48,0.35);
+  animation:pulseSweepRed 2.4s ease-in-out infinite 1.2s;
+}
+@keyframes pulseSweepRed {
+  0%   { opacity:0; transform:scale(1); }
+  20%  { opacity:1; }
+  100% { opacity:0; transform:scale(1.08); border-color:rgba(155,27,42,0); }
+}
+/* White pulse for THIS ISN'T FOR ME */
+#btn-no .btn-pulse-ring::before {
+  border-color:rgba(240,237,232,0.5);
+  animation:pulseSweepWhite 2.4s ease-in-out infinite;
+}
+#btn-no .btn-pulse-ring::after {
+  border-color:rgba(240,237,232,0.22);
+  animation:pulseSweepWhite 2.4s ease-in-out infinite 1.2s;
+}
+@keyframes pulseSweepWhite {
+  0%   { opacity:0; transform:scale(1); }
+  20%  { opacity:1; }
+  100% { opacity:0; transform:scale(1.08); border-color:rgba(240,237,232,0); }
+}
+
+/* ── DECISION — CENTERED ── */
+.decision-label { font-family:'Cinzel',serif; font-size:clamp(9px,2vw,10px); letter-spacing:.5em; color:var(--red); margin-bottom:30px; display:block; opacity:1; -webkit-text-stroke:0.4px var(--red); }
+.contact-line { font-size:clamp(30px,7vw,44px); font-weight:300; line-height:1.25; margin-bottom:52px; color:rgba(240,237,232,.9); text-align:center; }
+
+.buttons {
+  display:flex; flex-direction:row; gap:16px; align-items:stretch; justify-content:center; flex-wrap:nowrap;
+  opacity:0; pointer-events:none; width:100%; max-width:580px;
+}
+.buttons.visible {
+  opacity:1; pointer-events:all;
+}
+.buttons .btn { flex:1; }
+.buttons .btn-inner {
+  width:100%;
+  opacity:0;
+}
+
+/* ── SCAN WRITE-IN ENTRANCE ── */
+/* Phase 1 (0–16%): border appears at 0 opacity → full, text/bg/color hidden  */
+/* Phase 2 (16–56%): scan bar sweeps top→bottom, border glow builds           */
+/* Phase 3 (56–75%): glow holds at peak, scan exits                           */
+/* Phase 4 (75–100%): glow fades, text burns in slowly                        */
+
+
+@keyframes btnEntrance {
+  0%   { opacity:0; }
+  16%  { opacity:1; }
+  100% { opacity:1; }
+}
+
+/* Border glow keyframes — declared here, referenced in primary/ghost entrance rules below */
+@keyframes btnBorderGlowRed {
+  0%,16%  { box-shadow:none; }
+  55%     { box-shadow:0 0 0 1px rgba(196,18,48,0.9), 0 0 22px rgba(196,18,48,0.9), 0 0 50px rgba(196,18,48,0.55), 0 0 90px rgba(196,18,48,0.25); }
+  75%     { box-shadow:0 0 0 1px rgba(196,18,48,0.9), 0 0 22px rgba(196,18,48,0.9), 0 0 50px rgba(196,18,48,0.55), 0 0 90px rgba(196,18,48,0.25); }
+  100%    { box-shadow:none; }
+}
+@keyframes btnBorderGlowWhite {
+  0%,16%  { box-shadow:none; }
+  55%     { box-shadow:0 0 0 1px rgba(240,237,232,0.9), 0 0 22px rgba(240,237,232,0.7), 0 0 50px rgba(240,237,232,0.35), 0 0 90px rgba(240,237,232,0.12); }
+  75%     { box-shadow:0 0 0 1px rgba(240,237,232,0.9), 0 0 22px rgba(240,237,232,0.7), 0 0 50px rgba(240,237,232,0.35), 0 0 90px rgba(240,237,232,0.12); }
+  100%    { box-shadow:none; }
+}
+
+
+/* Scan bar element — injected by JS */
+.btn-scan {
+  position:absolute; left:0; right:0; top:0; height:2px;
+  background:linear-gradient(90deg, transparent 0%, rgba(196,18,48,0.6) 20%, rgba(196,18,48,1) 50%, rgba(196,18,48,0.6) 80%, transparent 100%);
+  box-shadow:0 0 10px rgba(196,18,48,0.9), 0 0 24px rgba(196,18,48,0.5), 0 2px 8px rgba(196,18,48,0.4);
+  pointer-events:none; z-index:3;
+  opacity:0; will-change:transform, opacity;
+}
+/* Scan bar — WHITE variant for btn-no */
+#btn-no .btn-scan {
+  background:linear-gradient(90deg, transparent 0%, rgba(220,218,214,0.6) 20%, rgba(235,233,229,1) 50%, rgba(220,218,214,0.6) 80%, transparent 100%);
+  box-shadow:0 0 10px rgba(235,233,229,0.7), 0 0 24px rgba(235,233,229,0.35), 0 2px 8px rgba(235,233,229,0.3);
+}
+.buttons.visible .btn-scan {
+  animation: btnScanSweep 3.5s ease forwards;
+}
+@keyframes btnScanSweep {
+  0%,15%   { opacity:0; transform:translateY(0); }
+  17%      { opacity:1; transform:translateY(0); }
+  56%      { opacity:0.7; transform:translateY(calc(100% + 60px)); }
+  57%,100% { opacity:0;  transform:translateY(calc(100% + 60px)); }
+}
+
+/* ── BUTTONS ── */
+.btn {
+  font-family:'Cinzel',serif; font-size:clamp(10px,2.5vw,11px);
+  letter-spacing:0.4em; padding:0; text-decoration:none;
+  border:none; display:inline-flex; cursor:pointer; background:transparent; outline:none;
+  position:relative;
+}
+.btn-inner {
+  display:flex; align-items:center; justify-content:center;
+  padding:20px clamp(16px,5vw,48px); min-width:clamp(140px,38vw,240px); position:relative; overflow:hidden;
+  transition:border-color 0.3s ease, box-shadow 0.4s ease;
+}
+.btn-inner::before {
+  content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+  transform:scaleY(0); transform-origin:bottom;
+  transition:transform 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+.btn-inner span { position:relative; z-index:1; }
+
+/* PRIMARY — transparent bg matching ghost, red border, red fill sweeps bottom→top on hover */
+.btn-primary .btn-inner { background:rgba(155,27,42,0.06); color:var(--white); border:1px solid var(--red); }
+.btn-primary .btn-inner::before { background:rgba(255,255,255,0.12); z-index:2; }
+.btn-primary .btn-inner::after {
+  content:''; position:absolute; inset:0; background:var(--red);
+  transform:translateY(101%); transition:transform 0.4s cubic-bezier(0.16,1,0.3,1); z-index:0;
+}
+.btn-primary:hover .btn-inner { border-color:var(--red); box-shadow:0 0 40px rgba(155,27,42,0.5), 0 0 80px rgba(155,27,42,0.2); }
+.btn-primary:hover .btn-inner::before { transform:scaleY(1); }
+.btn-primary:hover .btn-inner::after  { transform:translateY(0); }
+.btn-primary:active .btn-inner { transform:scale(0.97); }
+
+/* During entrance — text hidden until scan exits (~56%), burns in slowly to end */
+.buttons.visible .btn-primary .btn-inner {
+  background:transparent;
+  animation: btnEntrance 3.5s ease forwards, btnBorderGlowRed 3.5s ease forwards, btnPrimaryFill 3.5s ease forwards;
+}
+@keyframes btnPrimaryFill {
+  0%,16%  { background:transparent; color:transparent; border-color:var(--red); }
+  56%     { background:transparent; color:transparent; }
+  100%    { background:rgba(155,27,42,0.06); color:var(--white); }
+}
+
+/* GHOST — near-white fill sweeps bottom→top on hover, text turns black */
+.btn-ghost .btn-inner { background:rgba(155,27,42,0.06); color:rgba(240,237,232,0.65); border:1px solid rgba(240,237,232,0.2); }
+.btn-ghost .btn-inner::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:rgba(220,218,214,0.5); z-index:2; transform:scaleY(0); transform-origin:bottom; transition:transform 0.3s cubic-bezier(0.16,1,0.3,1); }
+.btn-ghost .btn-inner::after {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(ellipse at center, rgba(238,236,232,0.97) 0%, rgba(218,216,212,0.97) 100%);
+  transform:translateY(101%); transition:transform 0.4s cubic-bezier(0.16,1,0.3,1); z-index:0;
+}
+.btn-ghost:hover .btn-inner { border-color:rgba(240,237,232,0.8); box-shadow:0 0 28px rgba(240,237,232,0.25), 0 0 55px rgba(240,237,232,0.08); }
+.btn-ghost .btn-inner span { color:rgba(240,237,232,0.65); transition:color 0.25s ease; }
+.btn-ghost:hover .btn-inner span { color:#0a0a0a; transition:color 0.2s ease 0.2s; }
+.btn-ghost:hover .btn-inner::before { transform:scaleY(1); }
+.btn-ghost:hover .btn-inner::after  { transform:translateY(0); }
+.btn-ghost:active .btn-inner { transform:scale(0.97); }
+
+/* Ghost during entrance: span fades in after scan exits — opacity on span, not color on parent */
+.buttons.visible .btn-ghost .btn-inner {
+  animation: btnEntrance 3.5s ease forwards, btnBorderGlowWhite 3.5s ease forwards;
+}
+.buttons.visible .btn-ghost .btn-inner span {
+  animation: btnGhostReveal 3.5s ease forwards;
+  transition: none;
+}
+@keyframes btnGhostReveal {
+  0%,56%  { opacity:0; }
+  100%    { opacity:1; }
+}
+
+/* ══════════════════════════════════════════════════════
+   ANIMUS MEMORY LINE
+══════════════════════════════════════════════════════ */
+.memory-line {
+  position:fixed; right:22px; top:50%; transform:translateY(-50%) translateX(0);
+  z-index:50; opacity:0; transition:opacity 0.6s ease, transform 0.45s cubic-bezier(0.4,0,1,1);
+  pointer-events:none; contain:layout;
+}
+.memory-line.visible { opacity:1; }
+.memory-line.slide-out { transform:translateY(-50%) translateX(80px); opacity:0; }
+
+.memory-track {
+  position:relative; width:1px; height:180px;
+  background:rgba(155,27,42,0.12);
+}
+.memory-fill {
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  background:var(--red);
+  transform:scaleY(0); transform-origin:top;
+  transition:transform 0.7s cubic-bezier(0.16,1,0.3,1);
+  z-index:0;
+  will-change:transform;
+}
+.memory-node {
+  position:absolute; left:50%;
+  transform:translate(-50%,-50%);
+  width:7px; height:7px;
+  border:1px solid rgba(155,27,42,0.7);
+  background:rgba(155,27,42,0.2);
+  transition:all 0.4s ease;
+  z-index:1;
+}
+.memory-node[data-idx="0"] { top:0%; }
+.memory-node[data-idx="1"] { top:25%; }
+.memory-node[data-idx="2"] { top:50%; }
+.memory-node[data-idx="3"] { top:75%; }
+.memory-node[data-idx="4"] { top:100%; }
+.memory-node.active {
+  width:9px; height:9px;
+  background:var(--red);
+  border-color:var(--red);
+  box-shadow:0 0 14px rgba(155,27,42,1), 0 0 28px rgba(155,27,42,0.45);
+}
+.memory-node::after {
+  content:attr(data-label);
+  position:absolute; right:calc(100% + 14px); top:50%;
+  transform:translateY(-50%);
+  font-family:'Cinzel',serif; font-size:7px; letter-spacing:0.38em;
+  color:rgba(155,27,42,0.65); white-space:nowrap;
+  transition:color 0.45s ease;
+}
+.memory-node.active::after { color:rgba(155,27,42,1); }
+
+/* ════════════════════════════════════════
+   READY VIEW — scrollable
+════════════════════════════════════════ */
+#view-ready { overflow-y:auto; -webkit-overflow-scrolling:touch; justify-content:flex-start; padding:0; z-index:30; }
+.ready-ambient { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:80vw; height:80vh; background:radial-gradient(ellipse,rgba(155,27,42,.08) 0%,transparent 65%); pointer-events:none; animation:ambBreathe 4s ease-in-out infinite; }
+.ready-inner { position:relative; z-index:1; text-align:center; padding:80px 32px 80px; max-width:700px; width:100%; margin:0 auto; }
+
+.v-line-top { width:1px; height:60px; background:linear-gradient(to bottom,transparent,var(--red)); margin:0 auto 40px; opacity:0; transform:scaleY(0); transform-origin:top; }
+.v-line-top.go { animation:lineDown .8s ease forwards .2s; }
+@keyframes lineDown { to{opacity:1;transform:scaleY(1)} }
+.r-label { font-family:'Cinzel',serif; font-size:clamp(9px,2vw,10px); letter-spacing:.55em; color:var(--red); margin-bottom:36px; display:block; opacity:0; -webkit-text-stroke:0.4px var(--red); }
+.r-label.go { animation:fadeUp 1s ease forwards .7s; }
+.r-headline { font-weight:300; font-size:clamp(50px,13vw,82px); line-height:1.02; margin-bottom:40px; }
+.r-headline .line { display:block; overflow:hidden; padding-bottom:0.15em; margin-bottom:-0.15em; }
+.r-headline .line span { display:block; opacity:0; transform:translateY(105%); }
+.r-hl1.go { animation:lineReveal 1.1s cubic-bezier(.16,1,.3,1) forwards .9s; }
+.r-hl2.go { animation:lineReveal 1.1s cubic-bezier(.16,1,.3,1) forwards 1.15s; color:var(--red); font-style:italic; }
+.r-midline { width:40px; height:1px; background:var(--red); margin:0 auto 44px; opacity:0; transform:scaleX(0); }
+.r-midline.go { animation:scaleIn .8s ease forwards 1.7s; }
+@keyframes scaleIn { to{opacity:1;transform:scaleX(1)} }
+.r-copy { font-size:clamp(19px,4.5vw,24px); font-weight:300; line-height:1.85; color:rgba(240,237,232,.55); max-width:580px; margin:0 auto 48px; opacity:0; position:relative; }
+.r-copy.go { animation:fadeUp 1.2s ease forwards 2s; }
+.r-copy strong { color:var(--white); font-weight:400; }
+.r-copy em { color:var(--red); font-style:italic; }
+.r-btn-wrap { opacity:0; }
+.r-btn-wrap.go { animation:fadeUp 1.2s ease forwards 2.5s; }
+
+/* WhatsApp button — full architectural redesign */
+.btn-wa {
+  font-family:'Cinzel',serif; font-size:clamp(10px,2.5vw,11px);
+  letter-spacing:0.45em; text-decoration:none;
+  display:inline-flex; cursor:pointer;
+  background:transparent; border:none; outline:none; padding:0;
+}
+.btn-wa-inner {
+  display:flex; align-items:center; justify-content:center; gap:14px;
+  padding:22px clamp(40px,8vw,72px);
+  min-width:clamp(240px,70vw,340px);
+  border:1px solid var(--red);
+  color:var(--white);
+  position:relative; overflow:hidden;
+  transition:box-shadow 0.3s ease;
+}
+/* Left accent bar */
+.btn-wa-inner::before {
+  content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+  background:rgba(255,255,255,0.2);
+  transform:scaleY(0); transform-origin:bottom;
+  transition:transform 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+/* Red fill */
+.btn-wa-inner::after {
+  content:''; position:absolute; inset:0;
+  background:var(--red);
+  transform:translateX(-101%);
+  transition:transform 0.4s cubic-bezier(0.16,1,0.3,1);
+  z-index:0;
+}
+.btn-wa-inner span { position:relative; z-index:1; }
+/* WA icon */
+.btn-wa-icon {
+  position:relative; z-index:1;
+  width:16px; height:16px; flex-shrink:0;
+  opacity:0.7; transition:opacity 0.3s ease;
+}
+.btn-wa:hover .btn-wa-inner {
+  box-shadow:0 0 50px rgba(155,27,42,0.6), 0 0 100px rgba(155,27,42,0.2);
+}
+.btn-wa:hover .btn-wa-inner::before { transform:scaleY(1); }
+.btn-wa:hover .btn-wa-inner::after  { transform:translateX(0); }
+.btn-wa:hover .btn-wa-icon { opacity:1; }
+.btn-wa:active .btn-wa-inner { transform:scale(0.98); }
+/* Pulse ring */
+.btn-wa-ring {
+  position:absolute; inset:-1px;
+  border:1px solid rgba(155,27,42,0.3);
+  pointer-events:none;
+  animation:ringPulse 3s ease-in-out infinite 3.5s;
+}
+.v-line-bot { width:1px; height:60px; background:linear-gradient(to bottom,var(--red),transparent); margin:44px auto 0; opacity:0; transform:scaleY(0); transform-origin:top; }
+.v-line-bot.go { animation:lineDown .8s ease forwards 3s; }
+
+/* ════════════════════════════════════════
+   NOT-READY VIEW — scrollable
+════════════════════════════════════════ */
+#view-notready { overflow-y:auto; -webkit-overflow-scrolling:touch; justify-content:flex-start; padding:0; z-index:30; }
+.nr-inner { position:relative; z-index:1; text-align:center; padding:80px 32px 80px; max-width:680px; width:100%; margin:0 auto; }
+.nr-vline-top { width:1px; height:60px; background:linear-gradient(to bottom,transparent,rgba(155,27,42,.4)); margin:0 auto 40px; opacity:0; transform:scaleY(0); transform-origin:top; }
+.nr-vline-top.go { animation:lineDown .8s ease forwards .2s; }
+.nr-label { font-family:'Cinzel',serif; font-size:clamp(9px,2vw,10px); letter-spacing:.55em; color:rgba(155,27,42,.6); margin-bottom:36px; display:block; opacity:0; -webkit-text-stroke:0.4px rgba(155,27,42,.6); }
+.nr-label.go { animation:fadeUp 1s ease forwards .7s; }
+.nr-headline { font-weight:300; font-size:clamp(50px,13vw,82px); line-height:1.02; margin-bottom:44px; }
+.nr-headline .line { display:block; overflow:hidden; }
+.nr-headline .line span { display:block; opacity:0; transform:translateY(105%); }
+.nr-hl1.go { animation:lineReveal 1.1s cubic-bezier(.16,1,.3,1) forwards .9s; }
+.nr-hl2.go { animation:lineReveal 1.1s cubic-bezier(.16,1,.3,1) forwards 1.15s; color:rgba(155,27,42,.7); font-style:italic; }
+.nr-copy { font-size:clamp(19px,4.5vw,22px); font-weight:300; line-height:1.9; color:rgba(240,237,232,.38); max-width:520px; margin:0 auto 52px; opacity:0; position:relative; }
+.nr-copy.go { animation:fadeUp 1.2s ease forwards 1.9s; }
+.nr-btn-wrap { opacity:0; }
+.nr-btn-wrap.go { animation:fadeUp 1.2s ease forwards 2.4s; }
+.btn-prove { font-family:'Cinzel',serif; font-size:clamp(10px,2.5vw,11px); letter-spacing:.35em; padding:19px 52px; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; background:rgba(155,27,42,0.06); color:rgba(240,237,232,0.7); border:1px solid rgba(155,27,42,0.5); position:relative; overflow:hidden; cursor:pointer; transition:border-color 0.3s ease, box-shadow 0.4s ease, color 0.3s ease; outline:none; }
+.btn-prove::before { content:''; position:absolute; inset:0; background:var(--red); transform:translateY(101%); transition:transform 0.4s cubic-bezier(0.16,1,0.3,1); z-index:0; }
+.btn-prove:hover::before { transform:translateY(0); }
+.btn-prove:hover { color:var(--white); border-color:var(--red); box-shadow:0 0 40px rgba(155,27,42,.4), 0 0 80px rgba(155,27,42,0.15); }
+.btn-prove span { position:relative; z-index:1; }
+.nr-vline-bot { width:1px; height:60px; background:linear-gradient(to bottom,rgba(155,27,42,.3),transparent); margin:44px auto 0; opacity:0; transform:scaleY(0); transform-origin:top; }
+.nr-vline-bot.go { animation:lineDown .8s ease forwards 2.9s; }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── RESPONSIVE FIXES ── */
+@media (max-width: 480px) {
+  /* Prevent text overflow on very small screens */
+  .hero-headline { font-size:clamp(40px,13vw,64px); }
+  .statement { font-size:clamp(30px,10vw,48px); }
+  .contact-line { font-size:clamp(24px,7.5vw,36px); margin-bottom:36px; }
+  .r-headline, .nr-headline { font-size:clamp(40px,13vw,64px); }
+
+  /* Buttons full width on small screens */
+  .buttons { align-items:stretch; width:100%; }
+  .btn { width:100%; }
+  .btn-inner { min-width:unset; width:100%; padding:18px 20px; }
+
+  /* WA button full width */
+  .btn-wa { width:100%; }
+  .btn-wa-inner { min-width:unset; width:100%; padding:20px 20px; }
+
+  /* Portrait smaller so founder text isn't pushed off */
+  .portrait-wrap { width:clamp(140px,60vw,220px); margin-top:20px; }
+
+  /* Snap section padding tighter */
+  .snap-section { padding:32px 20px; }
+  #s0 { padding-top:clamp(60px,10vh,120px); }
+  .memory-line { right:12px; }
+  .memory-node::after { display:none; }
+
+  /* Ready/notready inner padding */
+  .ready-inner, .nr-inner { padding:20px 20px; }
+
+  /* Hide decorative vertical lines on mobile */
+  .v-line-top, .v-line-bot, .nr-vline-top, .nr-vline-bot { display:none; }
+
+  /* Tighten internal spacing so content fits viewport */
+  .r-label, .nr-label { margin-bottom:16px; }
+  .r-headline, .nr-headline { margin-bottom:20px; }
+  .r-midline { margin:0 auto 20px; }
+  .r-copy { margin:0 auto 24px; }
+  .nr-copy { margin:0 auto 28px; }
+
+  /* Center content vertically */
+  #view-ready, #view-notready { justify-content:center; }
+}
+
+@media (max-width: 360px) {
+  .hero-headline { font-size:38px; }
+  .r-headline, .nr-headline { font-size:38px; }
+  .intro-logo-wrap { width:180px; height:180px; }
+}
+
+/* ── DESKTOP WIDESCREEN ── */
+@media (min-width: 1024px) {
+  /* Intro — keep button from drifting too low */
+  .intro-logo-wrap { width:clamp(180px,18vw,260px); height:clamp(180px,18vw,260px); margin-bottom:16px; }
+  .intro-brand { margin-bottom:32px; }
+
+  /* Sections — full height, generous side padding */
+  .snap-section { padding:0 clamp(80px,10vw,160px); }
+  #s0 { padding-top:0; justify-content:center; }
+
+  /* Scale down headlines so they fit inside one screen height */
+  .hero-headline  { font-size:clamp(48px,5.5vw,72px); }
+  .statement      { font-size:clamp(34px,3.8vw,52px); }
+  .contact-line   { font-size:clamp(26px,3vw,40px); margin-bottom:40px; }
+  .r-headline, .nr-headline { font-size:clamp(44px,5vw,70px); }
+  .body-text      { font-size:clamp(17px,1.5vw,20px); }
+  .serve-text     { font-size:clamp(12px,1.2vw,14px); }
+
+  /* Portrait — smaller on desktop so founder text doesn't get cut */
+  .portrait-wrap  { width:clamp(140px,16vw,200px); margin-top:20px; }
+  .founder        { font-size:clamp(14px,1.2vw,17px); margin-top:16px; }
+  .brand          { margin-bottom:20px; }
+  .hero-headline  { margin-bottom:20px; }
+
+  /* Snap inner max width wider on desktop */
+  .snap-inner { max-width:720px; }
+
+  /* Buttons */
+  .btn-inner { padding:18px 56px; }
+}
+
+@media (min-width:1440px) {
+  .snap-section   { padding:0 clamp(120px,12vw,240px); }
+  .hero-headline  { font-size:clamp(44px,4.5vw,64px); }
+  .portrait-wrap  { width:clamp(130px,13vw,180px); }
+}
+
+/* ── EXIT / ENTER ZOOM TRANSITIONS ── */
+@keyframes zoomFadeOut {
+  0%   { opacity:1; transform:scale(1);    }
+  100% { opacity:0; transform:scale(1.08); }
+}
+@keyframes zoomFadeIn {
+  0%   { opacity:0; transform:scale(0.94); }
+  100% { opacity:1; transform:scale(1);    }
+}
+.exit-zoom  { animation:zoomFadeOut 0.45s cubic-bezier(0.16,1,0.3,1) forwards; pointer-events:none; }
+.enter-zoom { animation:zoomFadeIn  0.55s cubic-bezier(0.16,1,0.3,1) forwards; }
+
+/* ════════════════════════════════════════
+   CINEMATIC INTRO OVERLAY
+════════════════════════════════════════ */
+#cinematic-overlay {
+  position:fixed; inset:0; z-index:200;
+  background:transparent;
+  display:none;
+  align-items:center; justify-content:center;
+}
+/* Darkness canvas — data-line grid sweep */
+#cin-darkness-canvas {
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  z-index:0; pointer-events:none;
+  display:block;
+}
+#cin-flash {
+  position:fixed; inset:0; z-index:500;
+  background:#fff;
+  opacity:0; pointer-events:none;
+}
+@keyframes cinFlashAnim {
+  0%   { opacity:0;    }
+  18%  { opacity:0.92; }
+  100% { opacity:0;    }
+}
+.cin-logo-wrap {
+  position:relative; z-index:1;
+  width:clamp(240px,58vw,340px);
+  height:clamp(240px,58vw,340px);
+  opacity:0;
+  will-change:transform, opacity;
+}
+.cin-logo-wrap img {
+  width:100%; height:100%; object-fit:contain; display:block;
+  position:relative; z-index:1;
+  -webkit-mask-image:radial-gradient(ellipse 72% 72% at 50% 50%, black 38%, transparent 100%);
+  mask-image:radial-gradient(ellipse 72% 72% at 50% 50%, black 38%, transparent 100%);
+}
+/* Logo shine — plays during the 1.7s darkness sweep */
+@keyframes cinLogoShine {
+  0%   { filter:drop-shadow(0 0 28px rgba(155,27,42,0.95)) brightness(1.18); }
+  55%  { filter:drop-shadow(0 0 18px rgba(155,27,42,0.65)) brightness(1.08); }
+  100% { filter:drop-shadow(0 0 8px  rgba(155,27,42,0.35)) brightness(1.0);  }
+}
+.cin-logo-wrap.shining img { animation:cinLogoShine 1.7s ease forwards; }
+.cin-glow {
+  position:absolute; inset:-50px;
+  border-radius:50%;
+  background:radial-gradient(ellipse,rgba(155,27,42,0.45) 0%,transparent 65%);
+  opacity:0; pointer-events:none; z-index:0;
+}
+.cin-glow-outer {
+  position:absolute; inset:-100px;
+  border-radius:50%;
+  background:radial-gradient(ellipse,rgba(155,27,42,0.15) 0%,transparent 60%);
+  opacity:0; pointer-events:none; z-index:0;
+}
+.cin-frame {
+  position:absolute; inset:-20px; pointer-events:none; z-index:2;
+}
+.cin-frame span {
+  position:absolute; width:22px; height:22px; opacity:0;
+}
+.cin-frame span:nth-child(1) { top:0;    left:0;  border-top:1px solid var(--red); border-left:1px solid var(--red);   }
+.cin-frame span:nth-child(2) { top:0;    right:0; border-top:1px solid var(--red); border-right:1px solid var(--red);  }
+.cin-frame span:nth-child(3) { bottom:0; left:0;  border-bottom:1px solid var(--red); border-left:1px solid var(--red);  }
+.cin-frame span:nth-child(4) { bottom:0; right:0; border-bottom:1px solid var(--red); border-right:1px solid var(--red); }
+
+/* Cinematic keyframes */
+@keyframes cinLogoFadeOut {
+  0%   { opacity:1; transform:scale(1);     }
+  100% { opacity:0; transform:scale(1.015); }
+}
+@keyframes cinBracketDraw {
+  0%   { opacity:1; width:0;    height:0;    }
+  50%  { opacity:1; width:22px; height:0;    }
+  100% { opacity:1; width:22px; height:22px; }
+}
+@keyframes cinBracketOut {
+  0%   { opacity:1; transform:scale(1);    }
+  100% { opacity:0; transform:scale(1.18); }
+}
+@keyframes cinGlowReveal {
+  0%   { opacity:0; transform:scale(0.7); }
+  100% { opacity:1; transform:scale(1);   }
+}
+@keyframes cinGlowPulse {
+  0%,100% { opacity:0.25; transform:scale(0.96); }
+  50%     { opacity:0.55; transform:scale(1.06); }
+}
+
+
+</style>
+</head>
+<body>
+
+<!-- AUDIO -->
+<audio id="amb"           src="amb.mp3"       loop preload="auto"></audio>
+<audio id="sfx-data"      src="data.mp3"       loop preload="auto"></audio>
+<audio id="sfx-intro"     src="intro.mp3"       preload="auto"></audio>
+<audio id="sfx-drop"      src="drop.mp3"        preload="auto"></audio>
+<audio id="sfx-enter-h"  src="r0.mp3"         preload="auto"></audio>
+<audio id="sfx-enter-c"  src="ready.mp3"      preload="auto"></audio>
+<audio id="sfx-hover"    src="r0.mp3"          preload="auto"></audio>
+<audio id="sfx-accept"   src="accept.mp3"      preload="auto"></audio>
+<audio id="sfx-deny"     src="deny.mp3"        preload="auto"></audio>
+<audio id="sfx-decision" src="decision.mp3"    preload="auto"></audio>
+<audio id="sfx-back"     src="back.mp3"        preload="auto"></audio>
+<audio id="sfx-wa-h"    src="r0.mp3"          preload="auto"></audio>
+<audio id="sfx-wa-c"    src="ready.mp3"       preload="auto"></audio>
+
+<canvas id="grid-canvas"></canvas>
+<div class="grid-fog"></div>
+
+<div class="vignette"></div>
+
+<div id="scan-line"></div>
+
+<!-- CINEMATIC INTRO OVERLAY -->
+<div id="cinematic-overlay">
+  <canvas id="cin-darkness-canvas"></canvas>
+  <div class="cin-logo-wrap" id="cin-logo-wrap">
+    <div class="cin-glow" id="cin-glow"></div>
+    <div class="cin-glow-outer" id="cin-glow-outer"></div>
+    <div class="cin-frame">
+      <span></span><span></span><span></span><span></span>
+    </div>
+    <img src="blaqscale.jpg" alt="BlaqScale">
+  </div>
+</div>
+<div id="cin-flash"></div>
+
+<!-- CORNER LOGO (hidden on intro) -->
+<div class="corner-logo" id="corner-logo">
+  <img src="blaqscale.jpg" alt="BlaqScale">
+</div>
+
+<!-- BACK BUTTON (ready/notready only) -->
+<button class="btn-back" id="btn-back">
+  <div class="btn-back-arrow"></div>
+  <span>BACK</span>
+</button>
+
+<!-- ════ INTRO ════ -->
+<div class="vol-top" id="vol-top">
+  <div class="vol-beam vol-l"></div>
+  <div class="vol-beam vol-l2"></div>
+  <div class="vol-beam vol-r"></div>
+  <div class="vol-beam vol-r2"></div>
+  <div class="vol-beam vol-c"></div>
+</div>
+<div class="view active" id="view-intro">
+  <div class="intro-ambient"></div>
+  <div class="intro-logo-wrap">
+    <div class="logo-frame">
+      <span></span><span></span><span></span><span></span>
+    </div>
+    <img src="blaqscale.jpg" alt="BlaqScale">
+  </div>
+  <button class="btn-enter" id="btn-enter">
+    <div class="btn-enter-inner"><span>STEP INSIDE</span></div>
+  </button>
+</div>
+
+<!-- ════ MAIN ════ -->
+<div id="view-main" class="view">
+  <!-- Animus Memory Line -->
+  <div class="memory-line" id="memory-line">
+    <div class="memory-track">
+      <div class="memory-fill" id="memory-fill"></div>
+      <div class="memory-node active" data-idx="0" data-label="ORIGIN"></div>
+      <div class="memory-node"        data-idx="1" data-label="TRUTH"></div>
+      <div class="memory-node"        data-idx="2" data-label="METHOD"></div>
+      <div class="memory-node"        data-idx="3" data-label="MODEL"></div>
+      <div class="memory-node"        data-idx="4" data-label="DECISION"></div>
+    </div>
+  </div>
+  <div class="snap-container" id="snap">
+
+    <!-- 0: HERO — centered, no logo (corner logo shows instead) -->
+    <section class="snap-section" id="s0">
+      <div class="snap-inner" id="i0">
+        <span class="brand">BLAQSCALE</span>
+        <h1 class="hero-headline">
+          <span class="line"><span>One force.</span></span>
+          <span class="line"><span>All you need.</span></span>
+        </h1>
+        <div class="portrait-wrap">
+          <img src="waeven.jpg" alt="Waeven Xrysmond">
+          <div class="portrait-scanlines"></div>
+        </div>
+        <p class="founder">
+          <strong>Waeven Xrysmond.</strong> Founder of BlaqScale.<br>
+          The only man behind everything you're about to build.
+        </p>
+        <div class="accent-line"></div>
+
+      </div>
+    </section>
+
+    <!-- 1: TRUTH -->
+    <section class="snap-section" id="s1">
+      <div class="snap-inner" id="i1">
+        <span class="section-label">THE TRUTH</span>
+        <div class="divider-line"></div>
+        <h2 class="statement">We don't bring leads.<br><em>We bring revenue.</em></h2>
+        <p class="body-text">Most agencies hand you reports and disappear.<br><strong>We stay and turn them into money.</strong></p>
+      </div>
+    </section>
+
+    <!-- 2: METHOD -->
+    <section class="snap-section" id="s2">
+      <div class="snap-inner" id="i2">
+        <span class="section-label">THE METHOD</span>
+        <div class="divider-line"></div>
+        <h2 class="statement">Your clients are<br>already <em>searching.</em></h2>
+        <p class="body-text">They open Google. They type. Someone shows up first and gets the call.<br><strong>That someone should be you.</strong></p>
+        <p class="body-text">We build the system that puts you there — and makes sure they book, not just browse.</p>
+      </div>
+    </section>
+
+    <!-- 3: MODEL -->
+    <section class="snap-section" id="s3">
+      <div class="snap-inner" id="i3">
+        <span class="section-label">THE MODEL</span>
+        <div class="divider-line"></div>
+        <h2 class="statement">Skin in the game.<br><em>Mine.</em></h2>
+        <p class="body-text">I don't get paid to run ads.<br><strong>I get paid when I bring you <em style="color:var(--red);">money in the bank.</em></strong></p>
+      </div>
+    </section>
+
+    <!-- 4: DECISION -->
+    <section class="snap-section" id="s4" style="align-items:center;text-align:center;">
+      <div class="snap-inner" id="i4" style="display:flex;flex-direction:column;align-items:center;text-align:center;">
+        <span class="decision-label">DECISION</span>
+        <div class="divider-line"></div>
+        <p class="contact-line">You've read enough.<br>You know if this is for you.</p>
+        <div class="buttons" id="btns">
+          <button class="btn btn-primary" id="btn-yes">
+            <div class="btn-pulse-ring"></div>
+            <div class="btn-inner"><span>THIS IS FOR ME</span></div>
+          </button>
+          <button class="btn btn-ghost" id="btn-no">
+            <div class="btn-pulse-ring"></div>
+            <div class="btn-inner"><span>THIS ISN'T FOR ME</span></div>
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- ════ READY ════ -->
+<div class="view" id="view-ready">
+  <div class="ready-ambient"></div>
+  <div class="ready-inner">
+    <div class="v-line-top" id="r-tl"></div>
+    <span class="r-label" id="r-lb">READY</span>
+    <h1 class="r-headline">
+      <span class="line"><span class="r-hl1" id="r-h1">You didn't</span></span>
+      <span class="line"><span class="r-hl2" id="r-h2">need convincing.</span></span>
+    </h1>
+    <div class="r-midline" id="r-ml"></div>
+    <p class="r-copy" id="r-cp">
+      There's a moment in life where<br>
+      <strong>the right path is undeniable.</strong><br>
+      You're standing in yours.<br><br>
+      <em style="font-size:1.18em;">Some decisions make themselves.</em>
+    </p>
+    <div class="r-btn-wrap" id="r-bw">
+      <a href="https://wa.me/966563194704" class="btn-wa" id="btn-wa" target="_blank">
+        <div class="btn-wa-ring"></div>
+        <div class="btn-wa-inner">
+          <svg class="btn-wa-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+          <span>MEET THE FORCE</span>
+        </div>
+      </a>
+    </div>
+    <div class="v-line-bot" id="r-bl"></div>
+  </div>
+</div>
+
+<!-- ════ NOT-READY ════ -->
+<div class="view" id="view-notready">
+  <div class="nr-inner">
+    <div class="nr-vline-top" id="nr-tl"></div>
+    <span class="nr-label" id="nr-lb">NOT READY</span>
+    <h1 class="nr-headline">
+      <span class="line"><span class="nr-hl1" id="nr-h1">As</span></span>
+      <span class="line"><span class="nr-hl2" id="nr-h2">expected.</span></span>
+    </h1>
+    <p class="nr-copy" id="nr-cp">
+      You chose what most people choose.<br>
+      What feels safe.<br><br>
+      That's why most stay where they are.
+    </p>
+    <div class="nr-btn-wrap" id="nr-bw">
+      <button class="btn-prove" id="btn-prove"><span>PROVE OTHERWISE</span></button>
+    </div>
+    <div class="nr-vline-bot" id="nr-bl"></div>
+  </div>
+</div>
+
+<script>
+/* ── AUDIO ── */
+const amb = document.getElementById('amb');
+amb.volume = 1.0;
+
+// Shared AudioContext — created once, resumed on ENTER tap
+let _actx = null;
+function getAudioContext() {
+  if (!_actx) {
+    try { _actx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+  }
+  return _actx;
+}
+function unlockAudio() {
+  const ctx = getAudioContext();
+  if (ctx && ctx.state === 'suspended') ctx.resume();
+}
+
+function sfx(id) {
+  const a = document.getElementById(id);
+  if (!a) return;
+  a.currentTime = 0;
+  a.play().catch(()=>{});
+}
+
+/* ── HOVER — instant, cooldown prevents spam ── */
+function addHover(el, sfxId) {
+  let canPlay = true;
+  el.addEventListener('mouseenter', () => {
+    if (!canPlay) return;
+    sfx(sfxId);
+    canPlay = false;
+    setTimeout(() => canPlay = true, 500);
+  });
+  el.addEventListener('touchstart', () => sfx(sfxId), { passive:true });
+}
+
+/* ── VIEWS ── */
+const cornerLogo = document.getElementById('corner-logo');
+const btnBack    = document.getElementById('btn-back');
+
+// Cache all views at init — avoid DOM query on every navigation
+const _allViews = Array.from(document.querySelectorAll('.view'));
+
+function showView(id, showBack) {
+  for (let i = 0; i < _allViews.length; i++) {
+    _allViews[i].classList.remove('active');
+    if (_allViews[i].id !== 'view-main') _allViews[i].style.display = 'none';
+  }
+  const t = document.getElementById(id);
+  t.style.display = 'flex';
+  requestAnimationFrame(() => t.classList.add('active'));
+
+  // Corner logo: visible on all except intro
+  cornerLogo.classList.toggle('visible', id !== 'view-intro');
+
+  // Back button: only on ready/notready
+  if (showBack) {
+    btnBack.classList.add('visible');
+  } else {
+    btnBack.classList.remove('visible');
+  }
+}
+
+function goAnims(ids) {
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('go');
+    void el.offsetWidth;
+    el.classList.add('go');
+  });
+}
+
+/* ── DARKNESS CANVAS — PCB architecture sweep ── */
+function startDarknessCanvas() {
+  const dkCv = document.getElementById('cin-darkness-canvas');
+  if (!dkCv) return function(){};
+
+  const W   = dkCv.width  = window.innerWidth;
+  const H   = dkCv.height = window.innerHeight;
+  const cx  = W / 2, cy = H / 2;
+  const dc  = dkCv.getContext('2d');
+
+  const CELL = Math.max(22, Math.round(Math.min(W, H) / 15));
+  const cols = Math.ceil(W / CELL) + 4;
+  const rows = Math.ceil(H / CELL) + 4;
+  const gx0  = cx - Math.floor(cols / 2) * CELL;
+  const gy0  = cy - Math.floor(rows / 2) * CELL;
+
+  const cells = [];
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const x = gx0 + c * CELL, y = gy0 + r * CELL;
+      const d = Math.sqrt((x+CELL/2-cx)**2 + (y+CELL/2-cy)**2);
+      cells.push({ x, y, dist: d });
+    }
+  }
+  cells.sort((a, b) => a.dist - b.dist);
+  const maxDist = cells[cells.length - 1].dist + 1;
+
+  // ── PCB GENERATION ────────────────────────────────────────────────────
+  const _r = () => Math.random();
+  const pcbTraces = [];
+  const pcbVias   = [];
+  const compPads  = [];
+
+  // Horizontal traces — partial spans with gaps
+  for (let r = 0; r <= rows; r++) {
+    const y = gy0 + r * CELL;
+    if (y < -CELL || y > H + CELL) continue;
+    // Also add sub-grid row at half-cell offset
+    const ys = [y, y + CELL * 0.5 * (_r() < 0.3 ? 1 : 0)];
+    for (const yy of ys) {
+      if (yy === y + 0 && _r() < 0.1) continue; // skip some rows
+      let c = Math.floor(_r() * 2); // staggered start
+      while (c <= cols) {
+        if (_r() < 0.42) {
+          const len = 1 + Math.floor(_r() * 6);
+          const c2  = Math.min(c + len, cols);
+          const x1  = gx0 + c  * CELL;
+          const x2  = gx0 + c2 * CELL;
+          const isBus = _r() < 0.06;
+          const w   = isBus ? 2.4 : (_r() < 0.18 ? 1.2 : 0.5);
+          pcbTraces.push({ x1, y1: yy, x2, y2: yy, w, isBus });
+          if (_r() < 0.6) pcbVias.push({ x: x1, y: yy, sz: isBus ? 4 : 2.2 });
+          if (_r() < 0.6) pcbVias.push({ x: x2, y: yy, sz: isBus ? 4 : 2.2 });
+          c = c2 + 1 + Math.floor(_r() * 2);
+        } else { c++; }
+      }
+    }
+  }
+
+  // Vertical traces — partial spans
+  for (let c = 0; c <= cols; c++) {
+    const x = gx0 + c * CELL;
+    if (x < -CELL || x > W + CELL) continue;
+    const xs = [x, x + CELL * 0.5 * (_r() < 0.25 ? 1 : 0)];
+    for (const xx of xs) {
+      let r = Math.floor(_r() * 2);
+      while (r <= rows) {
+        if (_r() < 0.35) {
+          const len = 1 + Math.floor(_r() * 5);
+          const r2  = Math.min(r + len, rows);
+          const y1  = gy0 + r  * CELL;
+          const y2  = gy0 + r2 * CELL;
+          const w   = _r() < 0.14 ? 1.2 : 0.5;
+          pcbTraces.push({ x1: xx, y1, x2: xx, y2, w, isBus: false });
+          if (_r() < 0.45) pcbVias.push({ x: xx, y: y1, sz: 2.2 });
+          if (_r() < 0.45) pcbVias.push({ x: xx, y: y2, sz: 2.2 });
+          r = r2 + 1 + Math.floor(_r() * 2);
+        } else { r++; }
+      }
+    }
+  }
+
+  // Diagonal traces — 45° angles connecting nodes
+  for (let i = 0; i < Math.floor(cols * rows * 0.025); i++) {
+    const r1  = Math.floor(_r() * rows);
+    const c1  = Math.floor(_r() * cols);
+    const len = 1 + Math.floor(_r() * 3);
+    const dir = _r() < 0.5 ? 1 : -1;
+    const r2  = r1 + len, c2 = c1 + len * dir;
+    if (r2 > rows || c2 < 0 || c2 > cols) continue;
+    pcbTraces.push({
+      x1: gx0 + c1 * CELL, y1: gy0 + r1 * CELL,
+      x2: gx0 + c2 * CELL, y2: gy0 + r2 * CELL,
+      w: 0.5, isBus: false
+    });
+  }
+
+  // L-bend connectors
+  for (let i = 0; i < Math.floor(cols * rows * 0.045); i++) {
+    const r1 = Math.floor(_r() * rows), c1 = Math.floor(_r() * cols);
+    const r2 = r1 + 1 + Math.floor(_r() * 3), c2 = c1 + 1 + Math.floor(_r() * 3);
+    if (r2 > rows || c2 > cols) continue;
+    const x1 = gx0+c1*CELL, y1 = gy0+r1*CELL, x2 = gx0+c2*CELL, y2 = gy0+r2*CELL;
+    pcbTraces.push({ x1, y1, x2, y2: y1, w: 0.5, isBus: false });
+    pcbTraces.push({ x1: x2, y1, x2, y2, w: 0.5, isBus: false });
+    pcbVias.push({ x: x2, y: y1, sz: 2.8 });
+  }
+
+  // Component pad outlines — IC footprints
+  for (let i = 0; i < Math.floor(cols * rows * 0.015); i++) {
+    const c  = 1 + Math.floor(_r() * (cols - 2));
+    const r  = 1 + Math.floor(_r() * (rows - 2));
+    const pw = CELL * (1 + Math.floor(_r() * 2.5));
+    const ph = CELL * (1 + Math.floor(_r() * 1.5));
+    compPads.push({ x: gx0 + c * CELL, y: gy0 + r * CELL, w: pw, h: ph });
+  }
+
+  // ── BINARY SEQUENCES — animated bit-flipping data streams ─────────────
+  const SEQS = ['010110','100101','11001','10110100','01001','110010','011011','101010','001101','101101','110100','01110'];
+  const hSeqs = [], vSeqs = [];
+  const MIN_DIST = CELL * 3.5;
+
+  function tooClose(arr, nx, ny) {
+    return arr.some(s => Math.sqrt((s.x-nx)**2 + (s.y-ny)**2) < MIN_DIST);
+  }
+
+  for (let r = 0; r <= rows; r++) {
+    const y = gy0 + r * CELL;
+    if (y < -CELL || y > H + CELL || _r() > 0.22) continue;
+    const nx = gx0 + Math.floor(_r() * cols) * CELL + CELL / 2;
+    if (tooClose(hSeqs, nx, y)) continue;
+    hSeqs.push({ x: nx, y, chars: SEQS[Math.floor(_r() * SEQS.length)].split(''), phase: _r() * Math.PI * 2, speed: 0.7 + _r() * 1.8 });
+  }
+  for (let c = 0; c <= cols; c++) {
+    const x = gx0 + c * CELL;
+    if (x < -CELL || x > W + CELL || _r() > 0.18) continue;
+    const ny = gy0 + Math.floor(_r() * rows) * CELL + CELL / 2;
+    if (tooClose(vSeqs, x, ny)) continue;
+    vSeqs.push({ x, y: ny, chars: SEQS[Math.floor(_r() * SEQS.length)].split(''), phase: _r() * Math.PI * 2, speed: 0.6 + _r() * 1.6 });
+  }
+
+  const FONT_SZ   = Math.max(10, Math.round(CELL * 0.44));
+  const CHAR_W    = FONT_SZ * 0.62;
+  const SWEEP_DUR = 2200;
+  const BAND      = CELL * 3.5;
+  let sweepStart = null, holdStart = null;
+  let phase = 'sweep', raf = null;
+
+  // Shockwave state — independent from surge
+  let shockTime = null;
+  window._cinShockwave = function() { shockTime = null; _shockTriggered = true; };
+  let _shockTriggered = false;
+
+  // Fade to black state
+  let fadeBlackStart = null, fadeBlackDur = 650;
+  let _fadeBlackTriggered = false, fadeBlackProgress = 0;
+  window._cinFadeToBlack = function(dur) {
+    fadeBlackDur = dur || 650;
+    _fadeBlackTriggered = true;
+  };
+
+  // Surge state
+  let surgeStart = null, surgePower = 0, surgeActive = false;
+  window._cinSurge = function(power) {
+    surgeStart = null;
+    surgePower = (power !== undefined) ? power : 1.0;
+    surgeActive = true;
+  };
+
+  function drawBinary(t, surgeBoost, contentAlpha, fadeIn) {
+    if (fadeIn <= 0.15) return;
+    const df = Math.min(1, (fadeIn - 0.15) / 0.85) * contentAlpha;
+    dc.save();
+    dc.font         = `${FONT_SZ}px 'Courier New', monospace`;
+    dc.textAlign    = 'center';
+    dc.textBaseline = 'middle';
+
+    for (let i = 0; i < hSeqs.length; i++) {
+      const s = hSeqs[i];
+      const fl = 0.45 + 0.55 * (0.5 + 0.5 * Math.sin(t * s.speed + s.phase));
+      const baseAlpha = df * (fl * 0.85 + surgeBoost * 0.35);
+      for (let ci = 0; ci < s.chars.length; ci++) {
+        // Per-character bit flip — data flowing feel
+        const cp = t * s.speed * 2.8 + s.phase + ci * 0.55;
+        const flipped = Math.abs(Math.sin(cp * 4.1 + ci * 1.3)) > 0.96;
+        const bit = flipped ? (s.chars[ci] === '1' ? '0' : '1') : s.chars[ci];
+        const bx  = s.x + (ci - (s.chars.length - 1) / 2) * CHAR_W;
+        const charAlpha = baseAlpha * (flipped ? 1.4 : 1.0);
+        dc.shadowBlur  = flipped ? 35 + surgeBoost * 30 : 22 + surgeBoost * 28;
+        dc.shadowColor = 'rgba(196,18,48,1.0)';
+        dc.fillStyle   = `rgba(196,18,48,${charAlpha})`;
+        dc.fillText(bit, bx, s.y);
+        dc.shadowBlur  = flipped ? 55 : 40;
+        dc.fillStyle   = `rgba(155,27,42,${charAlpha * 0.4})`;
+        dc.fillText(bit, bx, s.y);
+      }
+    }
+
+    for (let i = 0; i < vSeqs.length; i++) {
+      const s = vSeqs[i];
+      dc.save();
+      dc.translate(s.x, s.y);
+      dc.rotate(Math.PI / 2);
+      const fl = 0.45 + 0.55 * (0.5 + 0.5 * Math.sin(t * s.speed + s.phase));
+      const baseAlpha = df * (fl * 0.85 + surgeBoost * 0.35);
+      for (let ci = 0; ci < s.chars.length; ci++) {
+        const cp = t * s.speed * 2.8 + s.phase + ci * 0.55;
+        const flipped = Math.abs(Math.sin(cp * 4.1 + ci * 1.3)) > 0.96;
+        const bit = flipped ? (s.chars[ci] === '1' ? '0' : '1') : s.chars[ci];
+        const bx  = (ci - (s.chars.length - 1) / 2) * CHAR_W;
+        const charAlpha = baseAlpha * (flipped ? 1.4 : 1.0);
+        dc.shadowBlur  = flipped ? 35 : 22 + surgeBoost * 28;
+        dc.shadowColor = 'rgba(196,18,48,1.0)';
+        dc.fillStyle   = `rgba(196,18,48,${charAlpha})`;
+        dc.fillText(bit, bx, 0);
+        dc.shadowBlur  = flipped ? 55 : 40;
+        dc.fillStyle   = `rgba(155,27,42,${charAlpha * 0.4})`;
+        dc.fillText(bit, bx, 0);
+      }
+      dc.restore();
+    }
+    dc.restore();
+  }
+
+  function drawPCB(traceBase, surgeBoost) {
+    dc.save();
+    dc.shadowBlur  = 7 + surgeBoost * 22;
+    dc.shadowColor = 'rgba(155,27,42,0.75)';
+    for (let i = 0; i < pcbTraces.length; i++) {
+      const tr = pcbTraces[i];
+      const alpha = traceBase * (tr.isBus ? 1.6 : 1.0);
+      dc.lineWidth   = tr.w;
+      dc.strokeStyle = `rgba(155,27,42,${alpha})`;
+      dc.beginPath(); dc.moveTo(tr.x1, tr.y1); dc.lineTo(tr.x2, tr.y2); dc.stroke();
+    }
+    // Vias
+    dc.shadowBlur = 10 + surgeBoost * 18;
+    dc.fillStyle = `rgba(196,18,48,${traceBase * 1.7})`;
+    for (let i = 0; i < pcbVias.length; i++) {
+      const v = pcbVias[i];
+      dc.fillRect(v.x - v.sz, v.y - v.sz, v.sz * 2, v.sz * 2);
+    }
+    // Component pad outlines
+    dc.shadowBlur = 5 + surgeBoost * 12;
+    dc.lineWidth  = 0.6;
+    dc.strokeStyle = `rgba(155,27,42,${traceBase * 0.6})`;
+    for (let i = 0; i < compPads.length; i++) {
+      const p = compPads[i];
+      dc.strokeRect(p.x, p.y, p.w, p.h);
+      // Center crosshair
+      dc.beginPath();
+      dc.moveTo(p.x + p.w/2 - 3, p.y + p.h/2); dc.lineTo(p.x + p.w/2 + 3, p.y + p.h/2);
+      dc.moveTo(p.x + p.w/2, p.y + p.h/2 - 3); dc.lineTo(p.x + p.w/2, p.y + p.h/2 + 3);
+      dc.stroke();
+    }
+    dc.restore();
+  }
+
+  function drawShockwave(ts) {
+    if (_shockTriggered && !shockTime) shockTime = ts;
+    if (!shockTime) return;
+
+    const elapsed  = ts - shockTime;
+    const DURATION = 650;
+    if (elapsed > DURATION) return;
+
+    const sp   = elapsed / DURATION;
+    const maxR = Math.sqrt(cx*cx + cy*cy) * 1.3;
+    const waveR = sp * maxR;
+    const BAND_W = maxR * 0.13;
+
+    // 1. CENTER CORE — bright red flash, gone by sp=0.18
+    const coreAlpha = Math.max(0, 1 - sp / 0.18);
+    if (coreAlpha > 0) {
+      const grad = dc.createRadialGradient(cx, cy, 0, cx, cy, 130);
+      grad.addColorStop(0,   `rgba(255,210,210,${coreAlpha * 0.95})`);
+      grad.addColorStop(0.25,`rgba(196,18,48,${coreAlpha * 0.85})`);
+      grad.addColorStop(1,   'rgba(155,27,42,0)');
+      dc.save();
+      dc.fillStyle = grad;
+      dc.fillRect(0, 0, W, H);
+      dc.restore();
+    }
+
+    // 2. TRACE ACTIVATION — electricity surging through the PCB
+    dc.save();
+    for (let i = 0; i < pcbTraces.length; i++) {
+      const tr = pcbTraces[i];
+      const mx = (tr.x1 + tr.x2) / 2, my = (tr.y1 + tr.y2) / 2;
+      const td = Math.sqrt((mx - cx) ** 2 + (my - cy) ** 2);
+      const delta = waveR - td;
+
+      if (delta < 0 || delta > BAND_W * 3.5) continue;
+
+      const t      = delta / BAND_W;
+      const bright = t < 1 ? t : Math.exp(-1.8 * (t - 1));
+      if (bright < 0.02) continue;
+
+      dc.save();
+      dc.shadowBlur  = 18 * bright;
+      dc.shadowColor = `rgba(196,18,48,${bright})`;
+      dc.lineWidth   = tr.isBus ? 3.2 : 1.0 + bright * 1.0;
+      dc.strokeStyle = `rgba(196,18,48,${bright * 0.95})`;
+      dc.beginPath(); dc.moveTo(tr.x1, tr.y1); dc.lineTo(tr.x2, tr.y2); dc.stroke();
+
+      // Bus traces go white-hot at peak
+      if (tr.isBus && bright > 0.35) {
+        dc.lineWidth   = 1.0;
+        dc.strokeStyle = `rgba(255,210,210,${(bright - 0.35) * 1.6})`;
+        dc.shadowBlur  = 10;
+        dc.shadowColor = 'rgba(255,200,200,0.9)';
+        dc.beginPath(); dc.moveTo(tr.x1, tr.y1); dc.lineTo(tr.x2, tr.y2); dc.stroke();
+      }
+      dc.restore();
+    }
+
+    // 3. VIA ACTIVATION — nodes flash as wave passes
+    for (let i = 0; i < pcbVias.length; i++) {
+      const v  = pcbVias[i];
+      const vd = Math.sqrt((v.x - cx) ** 2 + (v.y - cy) ** 2);
+      const delta = waveR - vd;
+
+      if (delta < 0 || delta > BAND_W * 3.5) continue;
+
+      const t      = delta / BAND_W;
+      const bright = t < 1 ? t : Math.exp(-1.8 * (t - 1));
+      if (bright < 0.05) continue;
+
+      const sz = v.sz * (1 + bright * 0.7);
+      dc.save();
+      dc.shadowBlur  = 16 * bright;
+      dc.shadowColor = `rgba(196,18,48,${bright})`;
+      dc.fillStyle   = `rgba(255,170,170,${bright * 0.95})`;
+      dc.fillRect(v.x - sz, v.y - sz, sz * 2, sz * 2);
+      dc.restore();
+    }
+    dc.restore();
+
+    // 4. LEADING EDGE RING — single clean wave front, heavy glow, fast decay
+    const ringAlpha = Math.max(0, 0.7 - sp * 0.9);
+    if (ringAlpha > 0.01) {
+      dc.save();
+      dc.shadowBlur  = 32 * (1 - sp);
+      dc.shadowColor = `rgba(196,18,48,${ringAlpha})`;
+      dc.lineWidth   = 1.2;
+      dc.strokeStyle = `rgba(196,18,48,${ringAlpha})`;
+      dc.beginPath(); dc.arc(cx, cy, Math.max(1, waveR), 0, Math.PI * 2); dc.stroke();
+      dc.restore();
+    }
+  }
+
+  function draw(ts) {
+    dc.clearRect(0, 0, W, H);
+
+    if (_fadeBlackTriggered && !fadeBlackStart) fadeBlackStart = ts;
+    if (fadeBlackStart) fadeBlackProgress = Math.min(1, (ts - fadeBlackStart) / fadeBlackDur);
+    const contentAlpha = 1 - fadeBlackProgress;
+
+    if (phase === 'sweep') {
+      if (!sweepStart) sweepStart = ts;
+      const raw   = Math.min(1, (ts - sweepStart) / SWEEP_DUR);
+      const eased = raw < 0.5 ? 2*raw*raw : 1 - Math.pow(-2*raw+2,2)/2;
+      const front = eased * maxDist;
+
+      dc.fillStyle = '#000';
+      for (let i = 0; i < cells.length; i++) {
+        if (cells[i].dist > front) break;
+        dc.fillRect(cells[i].x, cells[i].y, CELL, CELL);
+      }
+
+      // PCB inside dark zone — dim
+      dc.save();
+      dc.shadowBlur = 3; dc.shadowColor = 'rgba(155,27,42,0.4)';
+      for (let i = 0; i < pcbTraces.length; i++) {
+        const tr = pcbTraces[i];
+        const mx = (tr.x1+tr.x2)/2, my = (tr.y1+tr.y2)/2;
+        const td = Math.sqrt((mx-cx)**2 + (my-cy)**2);
+        if (td > front + CELL) continue;
+        dc.lineWidth   = tr.w;
+        dc.strokeStyle = `rgba(155,27,42,${0.20 * contentAlpha})`;
+        dc.beginPath(); dc.moveTo(tr.x1,tr.y1); dc.lineTo(tr.x2,tr.y2); dc.stroke();
+      }
+      dc.restore();
+
+      // Frontier — bright red traces at expanding edge
+      dc.save();
+      dc.shadowBlur = 18; dc.shadowColor = 'rgba(155,27,42,0.95)';
+      for (let i = 0; i < pcbTraces.length; i++) {
+        const tr  = pcbTraces[i];
+        const mx  = (tr.x1+tr.x2)/2, my = (tr.y1+tr.y2)/2;
+        const td  = Math.sqrt((mx-cx)**2 + (my-cy)**2);
+        const tE  = 1 - Math.abs(td - front) / BAND;
+        if (tE <= 0 || td < front - BAND || td > front + CELL) continue;
+        dc.globalAlpha = tE * 0.9 * contentAlpha;
+        dc.lineWidth   = tr.isBus ? 2.2 : 0.9;
+        dc.strokeStyle = `rgba(196,18,48,${tE * 0.9})`;
+        dc.beginPath(); dc.moveTo(tr.x1,tr.y1); dc.lineTo(tr.x2,tr.y2); dc.stroke();
+      }
+      dc.globalAlpha = 1;
+      dc.restore();
+
+      if (raw >= 1) { phase = 'hold'; holdStart = null; }
+
+    } else {
+      // HOLD
+      if (!holdStart) holdStart = ts;
+      const hEl   = ts - holdStart;
+      const fadeIn = Math.min(1, hEl / 500);
+      const t      = hEl / 1000;
+
+      // Surge calc
+      let surgeBoost = 0;
+      if (surgeActive) {
+        if (!surgeStart) surgeStart = ts;
+        const sRaw = Math.min(1, (ts - surgeStart) / 700);
+        surgeBoost = surgePower * (sRaw < 0.08 ? sRaw/0.08 : Math.exp(-6*(sRaw-0.08)));
+        if (sRaw >= 1) surgeActive = false;
+      }
+
+      // Black fill FIRST — everything draws on top of it
+      dc.fillStyle = '#000';
+      dc.fillRect(0, 0, W, H);
+
+      // Shockwave — drawn immediately after black fill
+      drawShockwave(ts);
+
+      // PCB traces + vias + component pads
+      drawPCB((0.28 + surgeBoost * 0.55) * fadeIn * contentAlpha, surgeBoost);
+
+      // Animated binary data
+      drawBinary(t, surgeBoost, contentAlpha, fadeIn);
+    }
+
+    raf = requestAnimationFrame(draw);
+  }
+
+  raf = requestAnimationFrame(draw);
+  return function stop() {
+    if (raf) { cancelAnimationFrame(raf); raf = null; }
+    window._cinSurge = null;
+    window._cinShockwave = null;
+    window._cinFadeToBlack = null;
+  };
+}
+
+/* ── INTRO ── */
+const btnEnter = document.getElementById('btn-enter');
+addHover(btnEnter, 'sfx-enter-h');
+
+btnEnter.addEventListener('click', () => {
+  unlockAudio();
+
+  const overlay      = document.getElementById('cinematic-overlay');
+  const flash        = document.getElementById('cin-flash');
+  const cinLogoWrap  = document.getElementById('cin-logo-wrap');
+  const cinGlow      = document.getElementById('cin-glow');
+  const cinGlowOuter = document.getElementById('cin-glow-outer');
+  const cinBrackets  = cinLogoWrap.querySelectorAll('.cin-frame span');
+  const introView    = document.getElementById('view-intro');
+  const introSfx     = document.getElementById('sfx-intro');
+
+  // ── PHASE 0: Play sfx ──
+  introSfx.currentTime = 0;
+  introSfx.play().catch(() => {});
+
+  // ── t=0: Intro view zooms toward camera and fades — fast but earned ──
+  introView.classList.add('exit-zoom');
+  introView.style.pointerEvents = 'none';
+  setTimeout(() => {
+    introView.style.display = 'none';
+    introView.classList.remove('active');
+    introView.classList.remove('exit-zoom');
+    introView.style.opacity = '';
+  }, 460);
+
+  // Show cinematic overlay — logo invisible, appears at t=1600ms with the shockwave
+  overlay.style.display       = 'flex';
+  cinLogoWrap.style.opacity   = '0';
+  cinLogoWrap.style.transform = 'none';
+
+  // Grid canvas push
+  const gridCanvas = document.getElementById('grid-canvas');
+  gridCanvas.style.animation = 'none';
+  gridCanvas.style.opacity   = '1';
+  if (window._gridPushIn) window._gridPushIn();
+
+  // ── PHASE 1 (t=150ms): Data-line darkness sweeps from logo center outward ──
+  let stopDarkness = function(){};
+  setTimeout(() => {
+    stopDarkness = startDarknessCanvas();
+  }, 150);
+
+  // ── PHASE 2 (t=500ms): Corner brackets draw themselves ──
+  setTimeout(() => {
+    cinBrackets.forEach((el, i) => {
+      el.style.animation = `cinBracketDraw 0.5s cubic-bezier(0.16,1,0.3,1) forwards ${i * 80}ms`;
+    });
+  }, 500);
+
+  // ── t=1850ms: Drop sound fires before logo ──
+  setTimeout(() => {
+    const drop = document.getElementById('sfx-drop');
+    drop.currentTime = 0;
+    drop.play().catch(() => {});
+  }, 1750);
+
+  // ── PHASE 3 (t=2400ms): Logo ignites in place — simultaneous with canvas shockwave ──
+  setTimeout(() => {
+    cinLogoWrap.style.opacity   = '1';
+    cinLogoWrap.style.transform = 'none';
+
+    // Logo materializes through the existing red glow — invisible → red haze → blazes in → settles
+    const impactAnim = cinLogoWrap.animate([
+      { opacity: 0,    filter: 'brightness(6.0) drop-shadow(0 0 90px rgba(155,27,42,1))',    transform: 'scale(1.0)',  offset: 0    },
+      { opacity: 0.15, filter: 'brightness(5.0) drop-shadow(0 0 80px rgba(155,27,42,1))',    transform: 'scale(1.0)',  offset: 0.05 },
+      { opacity: 1,    filter: 'brightness(3.2) drop-shadow(0 0 60px rgba(155,27,42,1))',    transform: 'scale(1.0)',  offset: 0.12 },
+      { opacity: 1,    filter: 'brightness(2.0) drop-shadow(0 0 32px rgba(155,27,42,0.9))',  transform: 'scale(1.04)', offset: 0.22 },
+      { opacity: 1,    filter: 'brightness(1.35) drop-shadow(0 0 16px rgba(155,27,42,0.6))', transform: 'scale(1.0)',  offset: 0.42 },
+      { opacity: 1,    filter: 'brightness(1.08) drop-shadow(0 0 8px rgba(155,27,42,0.35))', transform: 'scale(1.0)',  offset: 0.75 },
+      { opacity: 1,    filter: 'brightness(1.0) drop-shadow(0 0 4px rgba(155,27,42,0.2))',   transform: 'scale(1.0)',  offset: 1    },
+    ], { duration: 1100, easing: 'ease-out', fill: 'forwards' });
+    window._impactAnim = impactAnim;
+
+    // Canvas surge + shockwave — beat 1, full power
+    if (window._cinSurge) window._cinSurge(1.0);
+    if (window._cinShockwave) window._cinShockwave();
+  }, 2400);
+
+  // ── Beat 2 (t=3100ms): Aftershock — system stabilising ──
+  setTimeout(() => {
+    if (window._cinSurge) window._cinSurge(0.42);
+  }, 3100);
+
+  // ── PHASE 4 (t=1000ms): Subtle glow breathes in ──
+  setTimeout(() => {
+    cinGlow.style.animation      = 'cinGlowReveal 1s ease forwards, cinGlowPulse 2.2s ease-in-out infinite 1s';
+    cinGlowOuter.style.animation = 'cinGlowReveal 1.3s ease forwards 0.25s, cinGlowPulse 2.8s ease-in-out infinite 1.4s';
+  }, 1000);
+
+  // ── PHASE 5 (t=4300ms): Brackets exit, glow dies — logo stays ──
+  setTimeout(() => {
+    if (window._impactAnim) { window._impactAnim.cancel(); window._impactAnim = null; }
+    cinGlow.style.animation      = 'none';
+    cinGlowOuter.style.animation = 'none';
+    cinBrackets.forEach((el, i) => {
+      el.style.transition = 'none';
+      el.style.animation  = `cinBracketOut 0.5s ease forwards ${i * 60}ms`;
+    });
+    // Logo stays — no fade, no dissolve
+  }, 4300);
+
+  // ── PHASE 6 (t=4500ms): Activate main view behind overlay ──
+  setTimeout(() => {
+    amb.volume = 1.0;
+    amb.play().catch(() => {});
+
+    const main = document.getElementById('view-main');
+    main.style.transition = 'none';
+    main.style.opacity    = '1';
+    main.classList.add('active');
+    requestAnimationFrame(() => { main.style.transition = ''; });
+
+    cornerLogo.classList.add('visible');
+    document.getElementById('vol-top').classList.add('reveal');
+  }, 4500);
+
+  // ── FLASH-BLUR (t=4700ms): White flash wipes to main view ──
+  setTimeout(() => {
+    flash.style.animation = 'cinFlashAnim 0.55s ease forwards';
+    flash.style.filter    = 'blur(6px)';
+    setTimeout(() => { flash.style.filter = ''; }, 200);
+    setTimeout(() => { overlay.style.display = 'none'; }, 100);
+  }, 4700);
+
+  // ── PHASE 7 (t=5800ms): Cleanup ──
+  setTimeout(() => {
+    stopDarkness();
+    cinLogoWrap.classList.remove('shining');
+    flash.style.animation = '';
+
+    setTimeout(() => {
+      document.getElementById('i0').classList.add('visible');
+      document.getElementById('memory-line').classList.add('visible');
+    }, 150);
+  }, 5800);
+});
+
+/* ── ENTER KEY → triggers ENTER button (intro only) ── */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('view-intro').classList.contains('active')) {
+    btnEnter.click();
+  }
+});
+
+/* ── SNAP SCROLL ── */
+const snapEl = document.getElementById('snap');
+const sections = ['s0','s1','s2','s3','s4'];
+const inners   = ['i0','i1','i2','i3','i4'];
+const memoryNodes = document.querySelectorAll('.memory-node');
+const memoryFill  = document.getElementById('memory-fill');
+let decisionFired = false;
+
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const idx = sections.indexOf(e.target.id);
+    if (idx < 0) return;
+    memoryNodes.forEach((n, i) => n.classList.toggle('active', i === idx));
+    memoryFill.style.transform = `scaleY(${idx / (sections.length - 1)})`;
+    const inner = document.getElementById(inners[idx]);
+    if (inner) setTimeout(() => inner.classList.add('visible'), 80);
+    if (idx === 4 && !decisionFired) {
+      decisionFired = true;
+      sfx('sfx-decision');
+      setTimeout(() => document.getElementById('btns').classList.add('visible'), 450);
+    }
+    // Data reveal for body sections (not hero s0, not decision s4)
+    if (idx >= 1 && idx <= 3) {
+      const sId = sections[idx];
+      setTimeout(() => revealSection(sId), 950);
+    }
+  });
+}, { root: snapEl, threshold: 0.55 });
+
+sections.forEach(id => { const el = document.getElementById(id); if (el) obs.observe(el); });
+
+/* ── DECISION BUTTONS ── */
+const btnYes = document.getElementById('btn-yes');
+const btnNo  = document.getElementById('btn-no');
+addHover(btnYes, 'sfx-hover');
+addHover(btnNo,  'sfx-hover');
+
+btnYes.addEventListener('click', () => {
+  sfx('sfx-accept');
+  if (window._gridPushIn2_ready) window._gridPushIn2_ready();
+
+  // Slide memory-line out to the right
+  const ml = document.getElementById('memory-line');
+  if (ml) ml.classList.add('slide-out');
+
+  // Zoom out decision section
+  const i4 = document.getElementById('i4');
+  if (i4) i4.classList.add('exit-zoom');
+
+  setTimeout(() => {
+    const mainView = document.getElementById('view-main');
+    mainView.style.visibility = 'hidden';
+    mainView.classList.remove('active');
+    const i4inner = document.getElementById('i4');
+    if (i4inner) i4inner.classList.remove('exit-zoom');
+    showView('view-ready', true);
+    goAnims(['r-tl','r-lb','r-h1','r-h2','r-ml','r-cp','r-bw','r-bl']);
+    if (!readyRevealDone) {
+      readyRevealDone = true;
+      setTimeout(() => revealCopy('r-cp'), 3400);
+    }
+  }, 420);
+});
+
+btnNo.addEventListener('click', () => {
+  sfx('sfx-deny');
+  if (window._gridPushIn2_notready) window._gridPushIn2_notready();
+
+  // Slide memory-line out to the right
+  const ml = document.getElementById('memory-line');
+  if (ml) ml.classList.add('slide-out');
+
+  // Zoom out decision section
+  const i4b = document.getElementById('i4');
+  if (i4b) i4b.classList.add('exit-zoom');
+
+  setTimeout(() => {
+    const mainView = document.getElementById('view-main');
+    mainView.style.visibility = 'hidden';
+    mainView.classList.remove('active');
+    const i4bInner = document.getElementById('i4');
+    if (i4bInner) i4bInner.classList.remove('exit-zoom');
+    showView('view-notready', true);
+    goAnims(['nr-tl','nr-lb','nr-h1','nr-h2','nr-cp','nr-bw','nr-bl']);
+    if (!nrRevealDone) {
+      nrRevealDone = true;
+      setTimeout(() => revealCopy('nr-cp'), 3200);
+    }
+  }, 420);
+});
+
+/* ── PROVE OTHERWISE ── */
+const btnProve = document.getElementById('btn-prove');
+addHover(btnProve, 'sfx-hover');
+btnProve.addEventListener('click', () => {
+  btnBack.click();
+});
+
+addHover(btnBack, 'sfx-hover');
+btnBack.addEventListener('click', () => {
+  sfx('sfx-back');
+  if (window._gridPushBack) window._gridPushBack();
+
+  // Zoom out current ready/notready content
+  ['view-ready','view-notready'].forEach(id => {
+    const v = document.getElementById(id);
+    const inner = v.querySelector('.ready-inner, .nr-inner');
+    if (inner) inner.classList.add('exit-zoom');
+  });
+
+  setTimeout(() => {
+    ['view-ready','view-notready'].forEach(id => {
+      const v = document.getElementById(id);
+      v.style.display = 'none';
+      v.classList.remove('active');
+      // Clean exit-zoom for reuse
+      const inner = v.querySelector('.ready-inner, .nr-inner');
+      if (inner) inner.classList.remove('exit-zoom');
+    });
+    const main = document.getElementById('view-main');
+    main.style.visibility = '';
+    requestAnimationFrame(() => main.classList.add('active'));
+    btnBack.classList.remove('visible');
+
+    // Slide memory-line back in from the right
+    const ml = document.getElementById('memory-line');
+    if (ml) {
+      ml.classList.remove('slide-out');
+    }
+
+    // Zoom in decision section
+    const i4 = document.getElementById('i4');
+    if (i4) {
+      i4.classList.remove('exit-zoom');
+      i4.classList.add('enter-zoom');
+      setTimeout(() => i4.classList.remove('enter-zoom'), 600);
+    }
+
+    setTimeout(() => {
+      const decision = document.getElementById('s4');
+      if (decision) decision.scrollIntoView({ behavior:'instant' });
+    }, 50);
+  }, 420);
+});
+
+/* ── INIT ── */
+['view-ready','view-notready'].forEach(id => {
+  document.getElementById(id).style.display = 'none';
+});
+
+/* ── WHATSAPP BUTTON SOUNDS ── */
+const btnWa = document.getElementById('btn-wa');
+if (btnWa) {
+  addHover(btnWa, 'sfx-wa-h');
+  btnWa.addEventListener('click', () => sfx('sfx-wa-c'));
+}
+
+/* ── MOBILE: prevent scroll bounce / address bar resize issues ── */
+function setVh() {
+  document.documentElement.style.setProperty('--vh', window.innerHeight * 0.01 + 'px');
+}
+setVh();
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(setVh, 120);
+});
+
+/* ── MOBILE: disable pinch zoom interference ── */
+document.addEventListener('touchmove', e => {
+  if (e.touches.length > 1) e.preventDefault();
+}, { passive: false });
+
+/* ── 3D PERSPECTIVE GRID ── */
+(function() {
+  const cv = document.getElementById('grid-canvas');
+  const cx = cv.getContext('2d', { alpha: false });
+  let W, H, vpXv, vpYv;
+  // Drifted/render camera values — base (vpXv/vpYv/fovCurrent) + organic drift, computed once per frame
+  let vpXd = 0, vpYd = 0, fovD = 520;
+
+  // Base vanishing point ratios — used to rebuild targets on resize
+  let vpXRatio = 0.72;
+  let vpYRatio = 0.46;
+
+  // Cinematic camera targets — lerped every frame
+  let vpXTarget = 0, vpYTarget = 0;
+  let fovTarget = 520;
+  let fovCurrent = 520;
+  const VP_LERP  = 0.0016;
+  const FOV_LERP = 0.0014;
+
+  function resize() {
+    // Render at device pixel ratio (capped 2x) — fixes mobile pixelation.
+    // Backing store scales with DPR; ctx is scaled so all drawing math stays in CSS-pixel space.
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth;
+    H = window.innerHeight;
+    cv.width  = Math.round(W * dpr);
+    cv.height = Math.round(H * dpr);
+    cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    // Rebuild current and target positions from stored ratios — preserves in-flight lerp
+    vpXv      = W * vpXRatio;
+    vpYv      = H * vpYRatio;
+    vpXTarget = W * vpXRatio;
+    vpYTarget = H * vpYRatio;
+  }
+  resize();
+  let _canvasResizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(_canvasResizeTimer);
+    _canvasResizeTimer = setTimeout(resize, 120);
+  });
+
+  const Z_NEAR   = 0.8;
+  const Z_FAR    = 22;
+  const X_HALF   = 11;
+  const Y_MIN    = -5.6;
+  const Y_MAX    =  9.0;
+  const XCOLS    = 9;
+  const ZROWS    = 11;
+  const CAM_Y    = 1.8;
+  const BASE     = 0.18;
+
+  // Camera Z push — positive = forward (grid rushes toward viewer)
+  const CAM_Z_PUSH  = 3 * 1.4; // 3 rows × ROW_STEP equivalent in Z units
+  const CAM_Z_LERP  = 0.0018;   // lerp speed per ms — cinematic weighted push
+  let   camZTarget  = 0.0;
+  let   camZCurrent = 0.0;
+
+  // ── CINEMATIC CAMERA PERSPECTIVES ───────────────────────────────────────────
+  // Each view has a unique spatial position: Z depth + vanishing point (direction) + FOV
+  // vpX/vpYRatio are fractions of screen W/H — 0.5/0.5 = dead center
+  // Moving vpX left (< 0.5) tilts tunnel right; right (> 0.5) tilts tunnel left
+  // Moving vpY up (< 0.5) tilts tunnel down; down (> 0.5) tilts tunnel up
+
+  function _setCamPerspective(zTarget, xRatio, yRatio, fov) {
+    camZTarget  = zTarget;
+    vpXRatio    = xRatio;
+    vpYRatio    = yRatio;
+    vpXTarget   = W * xRatio;
+    vpYTarget   = H * yRatio;
+    fovTarget   = fov;
+  }
+
+  // INTRO → MAIN: camera pushes forward, slightly right-leaning, neutral height
+  // Feels like stepping through a door into a corridor
+  window._gridPushIn = function() {
+    _setCamPerspective(
+      CAM_Z_PUSH,   // moderate forward push
+      0.68,         // vanishing point slightly right of center
+      0.44,         // slightly above center — looking slightly down
+      560           // wider FOV — expansive arrival
+    );
+  };
+
+  // MAIN → READY: deep push, vanishing point drifts left and lower
+  // Intimate, descending — like being pulled into a private room
+  window._gridPushIn2_ready = function() {
+    _setCamPerspective(
+      CAM_Z_PUSH * 2.2,  // deep plunge
+      0.58,              // vanishing point left — tunnel bends left
+      0.54,              // slightly below center — weight, gravity
+      480                // tighter FOV — focused, intense
+    );
+  };
+
+  // MAIN → NOTREADY: deep push, vanishing point high-right
+  // Elevated, cold, dismissive — like looking down from a height
+  window._gridPushIn2_notready = function() {
+    _setCamPerspective(
+      CAM_Z_PUSH * 2.2,  // same deep plunge
+      0.78,              // hard right — tunnel leans sharply
+      0.36,              // high — camera looks down at you
+      500                // slightly compressed
+    );
+  };
+
+  // BACK → MAIN: Z pulls back, vanishing point re-centers
+  // Returning — the tunnel opens back up, neutral, familiar
+  window._gridPushBack = function() {
+    _setCamPerspective(
+      CAM_Z_PUSH * 0.6,  // partial pull-back — doesn't go to zero (that's jarring)
+      0.68,              // back to main's vanishing point
+      0.44,
+      540                // re-opens
+    );
+  };
+
+  const SCROLL_SPEED = 0.00025;
+  const X_SPAN   = X_HALF * 2;
+  const COL_STEP = X_SPAN / XCOLS;
+  let offsetX = 0;
+  // offsetXRaw never wraps — LiveLines track their X drift against this so they
+  // never see the discrete jump that offsetX's modulo-wrap intentionally creates
+  // for the infinitely-tiled static grid (which needs that wrap; LiveLines don't).
+  let offsetXRaw = 0;
+
+  const ROW_STEP = 1.4;
+
+  // Z tiling — uniform step across the visible Z range, infinite like Y
+  // Use linear spacing (no quadratic bake) — depth fade handled by zEdgeFade + normalized alpha
+  const Z_RANGE  = Z_FAR - Z_NEAR;
+  const Z_STEP   = Z_RANGE / ZROWS;          // spacing between Z slabs
+  const Z_BUF    = ZROWS + 5;               // max slots including overflow guards
+  const scrolledZ     = new Float32Array(Z_BUF);
+  const scrolledZDepth = new Float32Array(Z_BUF); // normalized [0,1] depth per slot
+  let   scrolledZLen  = 0;
+
+  function updateScrolledZ() {
+    // Infinite world-fixed slabs at Z_NEAR + k*Z_STEP for all integers k
+    // Find k range covering (camZCurrent, camZCurrent + Z_RANGE]
+    // As camZCurrent advances, low-k slabs exit near end, high-k slabs enter far end → infinite tunnel
+    const kMin = Math.ceil((camZCurrent - Z_NEAR) / Z_STEP) - 1;
+    let n = 0;
+    for (let dk = 0; dk <= ZROWS + 3; dk++) {
+      const k   = kMin + dk;
+      const wz  = Z_NEAR + k * Z_STEP;
+      const wze = wz - camZCurrent;
+      if (wze <= 0.001) continue;
+      if (wze > Z_RANGE + Z_STEP) break;
+      scrolledZ[n] = wz;
+      scrolledZDepth[n] = Math.min(1, wze / Z_RANGE);
+      n++;
+      if (n >= Z_BUF) break;
+    }
+    scrolledZLen = n;
+  }
+
+  // Pre-allocated typed arrays — no GC per frame
+  const X_BUF    = XCOLS + 7;
+  const Y_BUF    = Math.round((Y_MAX - Y_MIN) / ROW_STEP) + 5;
+  const scrolledX = new Float32Array(X_BUF);
+  const scrolledY = new Float32Array(Y_BUF);
+  let   scrolledXLen = 0, scrolledYLen = 0;
+
+  // Pre-allocated column screen endpoints — sized to Z_BUF cap
+  const NUM_ROWS = Math.round((Y_MAX - Y_MIN) / ROW_STEP);
+  const syMinArr = new Float32Array(Z_BUF);
+  const syMaxArr = new Float32Array(Z_BUF);
+
+  function updateScrolledX() {
+    let n = 0;
+    for (let i = -3; i <= XCOLS + 3; i++) scrolledX[n++] = -X_HALF + i * COL_STEP + offsetX;
+    scrolledXLen = n;
+  }
+
+  function updateScrolledY() {
+    let n = 0;
+    for (let i = -2; i <= NUM_ROWS + 2; i++) scrolledY[n++] = Y_MIN + i * ROW_STEP;
+    scrolledYLen = n;
+  }
+
+  function yPlaneFade(y) {
+    const zone = ROW_STEP * 1.5;
+    if (y < Y_MIN + zone) return Math.max(0, (y - (Y_MIN - ROW_STEP)) / (zone + ROW_STEP));
+    if (y > Y_MAX - zone) return Math.max(0, ((Y_MAX + ROW_STEP) - y) / (zone + ROW_STEP));
+    return 1.0;
+  }
+
+  // Pre-compute zone thresholds once — avoids repeated multiply in hot loop
+  const Z_NEAR_THRESH = Z_RANGE * 0.10;
+  const Z_FAR_THRESH  = Z_RANGE * 0.08;
+
+  // Z-edge fade: fade in near camera, fade out at far depth limit
+  // effective = true distance from camera (always > 0 for visible slabs)
+  function zEdgeFade(wz) {
+    const effective = wz - camZCurrent;
+    if (effective <= 0) return 0;
+    // Fade in over first 10% of visible depth range
+    const nearFade = Math.min(1, effective / Z_NEAR_THRESH);
+    // Fade out over last 8% of visible depth range
+    const farFade  = Math.min(1, (Z_RANGE - effective) / Z_FAR_THRESH);
+    return Math.max(0, Math.min(nearFade, farFade));
+  }
+
+  // Batch draw system — 24 fixed alpha buckets, no Map, no GC
+  const BATCH_BUCKETS = 24;
+  const BATCH_CAP     = 2048;
+  const batchBufs     = new Array(BATCH_BUCKETS);
+  const batchLens     = new Int32Array(BATCH_BUCKETS);
+  for (let k = 0; k < BATCH_BUCKETS; k++) batchBufs[k] = new Float32Array(BATCH_CAP);
+
+  // Pre-compute all strokeStyle strings — zero string alloc in hot path
+  const batchStyles = new Array(BATCH_BUCKETS);
+  for (let k = 0; k < BATCH_BUCKETS; k++) {
+    batchStyles[k] = 'rgba(229,228,226,' + (k / BATCH_BUCKETS).toFixed(2) + ')';
+  }
+
+  // Red glow batch — mirrors white batch, avoids per-segment draw calls
+  const redBatchBufs = new Array(BATCH_BUCKETS);
+  const redBatchLens = new Int32Array(BATCH_BUCKETS);
+  for (let k = 0; k < BATCH_BUCKETS; k++) redBatchBufs[k] = new Float32Array(BATCH_CAP);
+  const redBatchStyles = new Array(BATCH_BUCKETS);
+  for (let k = 0; k < BATCH_BUCKETS; k++) {
+    redBatchStyles[k] = 'rgba(155,27,42,' + (k / BATCH_BUCKETS).toFixed(2) + ')';
+  }
+
+  // zfArr — cached fade per Z slot, sized to Z_BUF cap
+  const zfArr = new Float32Array(Z_BUF);
+
+  function batchSeg(x1, y1, x2, y2, alpha) {
+    const k   = Math.min((alpha * BATCH_BUCKETS) | 0, BATCH_BUCKETS - 1);
+    const len = batchLens[k];
+    if (len + 4 <= BATCH_CAP) {
+      const arr = batchBufs[k];
+      arr[len] = x1; arr[len+1] = y1; arr[len+2] = x2; arr[len+3] = y2;
+      batchLens[k] = len + 4;
+    }
+  }
+
+  function redBatchSeg(x1, y1, x2, y2, alpha) {
+    const k   = Math.min((alpha * BATCH_BUCKETS) | 0, BATCH_BUCKETS - 1);
+    const len = redBatchLens[k];
+    if (len + 4 <= BATCH_CAP) {
+      const arr = redBatchBufs[k];
+      arr[len] = x1; arr[len+1] = y1; arr[len+2] = x2; arr[len+3] = y2;
+      redBatchLens[k] = len + 4;
+    }
+  }
+
+  function flushBatches() {
+    cx.lineWidth = 0.6;
+    for (let k = 0; k < BATCH_BUCKETS; k++) {
+      const len = batchLens[k];
+      if (!len) continue;
+      const arr = batchBufs[k];
+      cx.beginPath();
+      cx.strokeStyle = batchStyles[k];
+      for (let i = 0; i < len; i += 4) {
+        cx.moveTo(arr[i], arr[i+1]);
+        cx.lineTo(arr[i+2], arr[i+3]);
+      }
+      cx.stroke();
+      batchLens[k] = 0;
+    }
+    // Flush red glow batch
+    for (let k = 0; k < BATCH_BUCKETS; k++) {
+      const len = redBatchLens[k];
+      if (!len) continue;
+      const arr = redBatchBufs[k];
+      cx.beginPath();
+      cx.strokeStyle = redBatchStyles[k];
+      for (let i = 0; i < len; i += 4) {
+        cx.moveTo(arr[i], arr[i+1]);
+        cx.lineTo(arr[i+2], arr[i+3]);
+      }
+      cx.stroke();
+      redBatchLens[k] = 0;
+    }
+  }
+
+  // ── LIVELINES ENGINE — grid lines that draw in once, then fade out ─────────
+  // Each LiveLine has exactly 2 states:
+  //   DRAWING — a soft electric tip travels the line once, smoothly (no snap).
+  //             The trail behind it carries a soft bloom that's faint near the
+  //             back and brightest at the tip — like a comet, not a blob.
+  //   FADING  — the now fully-drawn line holds with one gentle pulse while it
+  //             fades to nothing, then the object is replaced by a fresh spawn
+  //             on a new random grid position. Bounded — never glows forever.
+  // World position is fixed at spawn. X drift is tracked against offsetXRaw
+  // (never wraps) so nothing snaps when the tiled grid's own scroll wraps.
+  // Diagonal (D) lines anchor to the tunnel's true near/far Z planes (constant
+  // offsets from the camera) rather than the nearest/farthest rendered grid
+  // slab — the slab array is quantized and jumps in steps as slabs enter/exit
+  // during camera Z movement; anchoring to the real near/far plane is both
+  // smoother and more correct.
+  // Size and brightness both fall off with true camera distance (recovered
+  // from the resolved projection scale) — near lines render full-size and
+  // bright, far lines render small and dim, the way actual distance looks.
+
+  const LL_COUNT    = 14;
+  const LL_DRAW_MIN = 3000,  LL_DRAW_MAX = 6000;
+  const LL_FADE_MIN = 3800,  LL_FADE_MAX = 7500;
+  const LL_BREATH_FREQ_MIN = 0.35, LL_BREATH_FREQ_MAX = 0.9; // Hz — slow, unhurried pulse
+
+  const LL_STATE_DRAW = 0;
+  const LL_STATE_FADE = 1;
+
+  // Per-tier visual weight — index 0/1/2, picked at spawn (20% / 65% / 15%)
+  const LL_TIER_MULT   = [0.30, 1.00, 1.55];
+  const LL_TIER_BASE_A = [0.13, 0.22, 0.34];
+  const LL_TIER_LW_MAX = [0.9,  1.4,  2.1];
+  const LL_DRAW_PEAK_MULT = 1.1; // tip flares gently brighter than the resting fade level — soft, not a hard spark
+
+  // Y positions evenly distributed in visible world range
+  const _GYWVALS = [];
+  for (let i = 0; i <= 8; i++) _GYWVALS.push(Y_MIN + (i / 8) * (Y_MAX - Y_MIN));
+  // X positions on column grid
+  const _GXWVALS = [];
+  for (let i = 0; i <= XCOLS; i++) _GXWVALS.push(-X_HALF + (i / XCOLS) * X_HALF * 2);
+
+  function llPickWz() {
+    if (scrolledZLen > 2) return scrolledZ[1 + Math.floor(Math.random() * (scrolledZLen - 2))];
+    return Z_NEAR + Z_RANGE * (0.2 + Math.random() * 0.6);
+  }
+
+  function llSpawnPos() {
+    // Bias: H=30%, D=25%, V=45% — compensates for H visual dominance
+    const roll = Math.random();
+    const type = roll < 0.30 ? 'H' : roll < 0.55 ? 'D' : 'V';
+    if (type === 'H') {
+      const idx = Math.floor(Math.random() * Math.max(1, scrolledYLen));
+      const wySpawn = scrolledYLen > 0 ? scrolledY[idx] : _GYWVALS[Math.floor(Math.random() * _GYWVALS.length)];
+      return { type, wySpawn, wz: llPickWz() };
+    } else if (type === 'D') {
+      const xi = Math.floor(Math.random() * Math.max(1, scrolledXLen));
+      const yi = Math.floor(Math.random() * Math.max(1, scrolledYLen));
+      const wxSpawn = scrolledXLen > 0 ? scrolledX[xi] : _GXWVALS[Math.floor(Math.random() * _GXWVALS.length)];
+      const wySpawn = scrolledYLen > 0 ? scrolledY[yi] : _GYWVALS[Math.floor(Math.random() * _GYWVALS.length)];
+      return { type, wxSpawn, spawnOffsetX: offsetXRaw, wySpawn };
+    } else {
+      const xi = Math.floor(Math.random() * Math.max(1, scrolledXLen));
+      const wxSpawn = scrolledXLen > 0 ? scrolledX[xi] : _GXWVALS[Math.floor(Math.random() * _GXWVALS.length)];
+      return { type, wxSpawn, spawnOffsetX: offsetXRaw, wz: llPickWz() };
+    }
+  }
+
+  function llResolve(p) {
+    if (p.type === 'H') {
+      const wze = p.wz - camZCurrent; if (wze <= 0.001) return null;
+      const wy = p.wySpawn;
+      const s  = fovD / wze;
+      const sy = vpYd - (wy - CAM_Y) * s;
+      return { x0: vpXd - X_HALF * s, y0: sy, x1: vpXd + X_HALF * s, y1: sy, s };
+    } else if (p.type === 'D') {
+      // Anchored to the tunnel's true near/far Z planes — constant offsets from
+      // the camera, so this is perfectly smooth regardless of how the discrete
+      // grid slab array is currently stepping. wze is just Z_NEAR / Z_FAR.
+      const wx = p.wxSpawn + (offsetXRaw - p.spawnOffsetX);
+      const wy = p.wySpawn;
+      const sNr = fovD / Z_NEAR;
+      const sFr = fovD / Z_FAR;
+      const sM  = fovD / ((Z_NEAR + Z_FAR) * 0.5);
+      return {
+        x0: vpXd + wx * sNr, y0: vpYd - (wy - CAM_Y) * sNr,
+        x1: vpXd + wx * sFr, y1: vpYd - (wy - CAM_Y) * sFr,
+        s: sM };
+    } else {
+      const wze = p.wz - camZCurrent; if (wze <= 0.001) return null;
+      const wx = p.wxSpawn + (offsetXRaw - p.spawnOffsetX);
+      const s  = fovD / wze;
+      const sx = vpXd + wx * s;
+      return { x0: sx, y0: vpYd - (Y_MIN - CAM_Y) * s, x1: sx, y1: vpYd - (Y_MAX - CAM_Y) * s, s };
+    }
+  }
+
+  function llMake() {
+    const tierRoll = Math.random();
+    const tier = tierRoll < 0.2 ? 0 : tierRoll < 0.85 ? 1 : 2;
+    return {
+      spawn: llSpawnPos(),
+      state: LL_STATE_DRAW,
+      t: 0,
+      durMs: LL_DRAW_MIN + Math.random() * (LL_DRAW_MAX - LL_DRAW_MIN),
+      dir: Math.random() < 0.5 ? 1 : -1,
+      tier,
+      isRed: Math.random() < 0.15,
+      breathFreq: LL_BREATH_FREQ_MIN + Math.random() * (LL_BREATH_FREQ_MAX - LL_BREATH_FREQ_MIN),
+      breathPhase: Math.random() * Math.PI * 2
+    };
+  }
+
+  // Smooth ease — slow start, fast middle, slow finish. No snap at birth.
+  function llEaseInOut(t) {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  }
+
+  function llColor(isRed, alpha) {
+    const a = Math.max(0, Math.min(1, alpha));
+    return isRed ? `rgba(155,27,42,${a.toFixed(3)})` : `rgba(229,228,226,${a.toFixed(3)})`;
+  }
+
+  const liveLines = [];
+  for (let i = 0; i < LL_COUNT; i++) {
+    const g = llMake();
+    // Stagger initial population — on load, lines should already be mid-life
+    // at different points, not all synchronously drawing in from zero.
+    if (Math.random() < 0.55) {
+      g.state = LL_STATE_FADE;
+      g.t = Math.random();
+      g.durMs = LL_FADE_MIN + Math.random() * (LL_FADE_MAX - LL_FADE_MIN);
+    } else {
+      g.t = Math.random(); // stays in LL_STATE_DRAW from llMake()
+    }
+    liveLines.push(g);
+  }
+
+  function liveLines_update(dt) {
+    const safeDt = Math.min(dt, 50); // clamp — prevents spike on tab refocus
+    for (let i = 0; i < liveLines.length; i++) {
+      const g = liveLines[i];
+      g.t += safeDt / g.durMs;
+      if (g.t < 1.0) continue;
+      if (g.state === LL_STATE_DRAW) {
+        g.state = LL_STATE_FADE;
+        g.t = 0;
+        g.durMs = LL_FADE_MIN + Math.random() * (LL_FADE_MAX - LL_FADE_MIN);
+      } else {
+        liveLines[i] = llMake();
+      }
+    }
+  }
+
+  function liveLines_draw(nowMs) {
+    for (let i = 0; i < liveLines.length; i++) {
+      const g = liveLines[i];
+      const r = llResolve(g.spawn);
+      if (!r) continue;
+
+      // Recover true camera-relative depth from the resolved projection scale,
+      // then derive size + brightness from it. 0 = at the near plane (full
+      // size, full bright), 1 = at the far plane (small, dim) — real distance.
+      const wze = fovD / r.s;
+      const depthFrac = Math.min(1, Math.max(0, (wze - Z_NEAR) / Z_RANGE));
+      const sizeFactor = 1 - depthFrac * 0.82;
+      const perspA      = 1 - depthFrac * 0.78;
+
+      const tierMult = LL_TIER_MULT[g.tier];
+      const baseA    = LL_TIER_BASE_A[g.tier];
+      const lwMax    = LL_TIER_LW_MAX[g.tier];
+      const lw       = Math.max(0.12, lwMax * sizeFactor);
+      const x0 = r.x0, y0 = r.y0, x1 = r.x1, y1 = r.y1;
+      const dx = x1 - x0, dy = y1 - y0;
+      // Bloom radius scales with size too — soft, diffuse, and shrinks with distance
+      const blur = (6 + g.tier * 5) * (0.4 + 0.6 * sizeFactor);
+
+      if (g.state === LL_STATE_DRAW) {
+        const tipT   = llEaseInOut(g.t);
+        const tipPos = g.dir > 0 ? tipT : 1 - tipT;
+        const tailPos = g.dir > 0 ? 0 : 1;
+        const tipX = x0 + dx * tipPos,  tipY = y0 + dy * tipPos;
+        const tailX = x0 + dx * tailPos, tailY = y0 + dy * tailPos;
+        if (Math.hypot(tipX - tailX, tipY - tailY) < 0.5) continue; // nothing meaningful yet
+
+        const startFade = Math.min(1, g.t / 0.12);            // fades IN at birth — no pop
+        const crossFade = Math.max(0, (g.t - 0.82) / 0.18);   // blends to uniform right before FADE takes over
+        const tipAlpha  = baseA * LL_DRAW_PEAK_MULT * tierMult * perspA * startFade;
+        const tailAlpha = tipAlpha * (0.06 + 0.94 * crossFade);
+
+        const grad = cx.createLinearGradient(tailX, tailY, tipX, tipY);
+        grad.addColorStop(0,    llColor(g.isRed, tailAlpha * 0.4));
+        grad.addColorStop(0.4,  llColor(g.isRed, tailAlpha + (tipAlpha - tailAlpha) * 0.25));
+        grad.addColorStop(0.75, llColor(g.isRed, tailAlpha + (tipAlpha - tailAlpha) * 0.6));
+        grad.addColorStop(1,    llColor(g.isRed, tipAlpha));
+
+        cx.shadowColor = llColor(g.isRed, Math.min(1, tipAlpha * 1.2));
+        cx.shadowBlur  = blur;
+        cx.strokeStyle = grad;
+        cx.lineWidth   = lw;
+        cx.beginPath();
+        cx.moveTo(tailX, tailY);
+        cx.lineTo(tipX, tipY);
+        cx.stroke();
+      } else { // LL_STATE_FADE — one gentle pulse while it gracefully fades to nothing
+        const pulse   = 0.75 + 0.25 * Math.sin(nowMs * 0.001 * Math.PI * 2 * g.breathFreq + g.breathPhase);
+        const fadeEnv = Math.pow(1 - g.t, 1.4);
+        const alpha   = baseA * tierMult * perspA * pulse * fadeEnv;
+        if (alpha < 0.006) continue;
+
+        cx.shadowColor = llColor(g.isRed, Math.min(1, alpha * 1.2));
+        cx.shadowBlur  = blur;
+        cx.strokeStyle = llColor(g.isRed, alpha);
+        cx.lineWidth   = lw;
+        cx.beginPath();
+        cx.moveTo(x0, y0);
+        cx.lineTo(x1, y1);
+        cx.stroke();
+      }
+    }
+    // Reset shadow state — otherwise it leaks into next frame's grid/fog draws
+    cx.shadowBlur = 0;
+    cx.shadowColor = 'transparent';
+  }
+
+  let sN = 0;
+  let sF = 0;
+  let last = 0;
+
+  // Fog gradient cache — rebuilt only when vpYd or H changes by >0.5px
+  let _fogFloorGrad = null, _fogTopGrad = null;
+  let _fogVpYv = -1, _fogH = -1, _fogW = -1;
+
+  function rebuildFogGradients() {
+    const fogFloor = cx.createLinearGradient(0, vpYd, 0, H);
+    fogFloor.addColorStop(0,    'rgba(2,2,3,0.0)');
+    fogFloor.addColorStop(0.18, 'rgba(1,1,2,0.20)');
+    fogFloor.addColorStop(0.38, 'rgba(1,1,2,0.52)');
+    fogFloor.addColorStop(0.60, 'rgba(0,0,1,0.82)');
+    fogFloor.addColorStop(1,    'rgba(0,0,0,0.97)');
+    _fogFloorGrad = fogFloor;
+
+    const fogTop = cx.createLinearGradient(0, 0, 0, vpYd);
+    fogTop.addColorStop(0,    'rgba(0,0,0,0.82)');
+    fogTop.addColorStop(0.40, 'rgba(0,0,1,0.62)');
+    fogTop.addColorStop(0.62, 'rgba(1,1,2,0.36)');
+    fogTop.addColorStop(0.82, 'rgba(1,1,2,0.12)');
+    fogTop.addColorStop(1,    'rgba(2,2,3,0.0)');
+    _fogTopGrad = fogTop;
+
+    _fogVpYv = vpYd; _fogH = H; _fogW = W;
+  }
+
+  function frame(ts) {
+    const dt = Math.min(ts - last, 80);
+    last = ts;
+
+    // ── CINEMATIC CAMERA LERP — vanishing point + FOV (base/target camera) ──
+    // vpXv / vpYv / fovCurrent are the click-triggered base — drift layers on top of this.
+    vpXv     += (vpXTarget  - vpXv)     * Math.min(dt * VP_LERP,  1);
+    vpYv     += (vpYTarget  - vpYv)     * Math.min(dt * VP_LERP,  1);
+    fovCurrent += (fovTarget - fovCurrent) * Math.min(dt * FOV_LERP, 1);
+
+    // Animate camera Z push with smooth lerp
+    camZCurrent += (camZTarget - camZCurrent) * Math.min(dt * CAM_Z_LERP, 1);
+
+    // ── CAMERA DRIFT — the camera never sits still ──────────────────────────
+    // Two incommensurate sine waves per axis (no shared period — never repeats
+    // the same path). Amplitudes are small: you feel the camera live, you don't
+    // watch it move. Drift orbits the lerped base above, so click-triggered
+    // camera shifts (_gridPushIn etc.) still work exactly as before — drift
+    // just rides on top of whatever base they set.
+    const tSec = ts * 0.001;
+    const driftX = (Math.sin(tSec * 0.5464) + Math.sin(tSec * 0.8378 + 2.1)) * (W * 0.0175);
+    const driftY = (Math.sin(tSec * 0.4488 + 1.7) + Math.sin(tSec * 0.6981 + 0.4)) * (H * 0.01);
+    const driftFov = (Math.sin(tSec * 0.3696 + 0.9) + Math.sin(tSec * 0.5712 + 2.3)) * 11;
+    vpXd = vpXv + driftX;
+    vpYd = vpYv + driftY;
+    fovD = fovCurrent + driftFov;
+
+    // sN/sF updated after scrolledZ is built — use actual first/last slab wze
+    offsetXRaw -= SCROLL_SPEED * dt;
+    offsetX = ((offsetXRaw % COL_STEP) + COL_STEP) % COL_STEP;
+
+    // Rebuild scrolledZ every frame — camera Z moves continuously
+    updateScrolledZ();
+
+    // sN/sF: perspective scale at near and far ends of visible tunnel
+    if (scrolledZLen > 0) {
+      sN = fovD / Math.max(scrolledZ[0] - camZCurrent, 0.001);
+      sF = fovD / Math.max(scrolledZ[scrolledZLen - 1] - camZCurrent, 0.001);
+    }
+
+    cx.fillStyle = '#000';
+    cx.fillRect(0, 0, W, H);
+
+    updateScrolledX();
+
+    // Column prep — fill zfArr/syMinArr/syMaxArr from live scrolledZ
+    for (let zi = 0; zi < scrolledZLen; zi++) {
+      const wz  = scrolledZ[zi];
+      const zf  = zEdgeFade(wz);
+      zfArr[zi] = zf;
+      if (zf <= 0) { syMinArr[zi] = -1; syMaxArr[zi] = -1; continue; }
+      const wze = wz - camZCurrent;
+      if (wze <= 0) { syMinArr[zi] = -1; syMaxArr[zi] = -1; continue; }
+      const s = fovD / wze;
+      syMinArr[zi] = vpYd - (Y_MIN - CAM_Y) * s;
+      syMaxArr[zi] = vpYd - (Y_MAX - CAM_Y) * s;
+    }
+
+    // Draw horizontal planes (Y-scrollable)
+    for (let yi = 0; yi < scrolledYLen; yi++) {
+      const y        = scrolledY[yi];
+      const edgeFade = yPlaneFade(y);
+      if (edgeFade <= 0) continue;
+      const yFade = (y < 0 ? 1.0 : Math.max(0, 0.85 - Math.abs(y) / (Y_MAX * 2.2))) * edgeFade;
+
+      for (let zi = 0; zi < scrolledZLen; zi++) {
+        const zf = zfArr[zi];
+        if (zf <= 0) continue;
+        const wze = scrolledZ[zi] - camZCurrent;
+        if (wze <= 0) continue;
+        const s     = fovD / wze;
+        const sy    = vpYd - (y - CAM_Y) * s;
+        const alpha = BASE * (1 - scrolledZDepth[zi] * 0.82) * yFade * zf;
+        batchSeg(vpXd - X_HALF * s, sy, vpXd + X_HALF * s, sy, alpha);
+      }
+
+      // Vertical depth lines — near/far endpoints use live sN/sF
+      const alphaCol = BASE * yFade;
+      const cyN = vpYd - (y - CAM_Y) * sN;
+      const cyF = vpYd - (y - CAM_Y) * sF;
+      for (let xi = 0; xi < scrolledXLen; xi++) {
+        batchSeg(vpXd + scrolledX[xi] * sN, cyN, vpXd + scrolledX[xi] * sF, cyF, alphaCol);
+      }
+    }
+
+    // Draw vertical column lines
+    for (let xi = 0; xi < scrolledXLen; xi++) {
+      const wx = scrolledX[xi];
+      for (let zi = 0; zi < scrolledZLen; zi++) {
+        if (syMinArr[zi] < 0) continue;
+        const wze = scrolledZ[zi] - camZCurrent;
+        if (wze <= 0) continue;
+        const s   = fovD / wze;
+        const sx  = vpXd + wx * s;
+        const alpha = (BASE - 0.02) * (1 - scrolledZDepth[zi] * 0.82) * zfArr[zi];
+        batchSeg(sx, syMinArr[zi], sx, syMaxArr[zi], alpha);
+      }
+    }
+
+    flushBatches();
+
+    // ── FLOOR FOG — dark ground swallowing lower grid ─────────────────────────
+    // Threshold compares against vpYd (the actual drawn position) — drift keeps
+    // this moving by more than 0.5px almost every frame, so fog rebuilds stay
+    // continuously in sync with the live camera, never lagging behind it.
+    if (Math.abs(vpYd - _fogVpYv) > 0.5 || H !== _fogH || W !== _fogW) rebuildFogGradients();
+    cx.fillStyle = _fogFloorGrad;
+    cx.fillRect(0, vpYd, W, H - vpYd);
+
+    // ── CEILING FOG — dark sky swallowing upper grid ──────────────────────────
+    cx.fillStyle = _fogTopGrad;
+    cx.fillRect(0, 0, W, vpYd);
+
+    // ── LIVELINES — drawing → breathing → dying, forever ─────────────────────
+    liveLines_update(dt);
+    liveLines_draw(ts);
+    requestAnimationFrame(frame);
+  }
+  updateScrolledY();
+  requestAnimationFrame(frame);
+})();
+
+/* ── DATA REVEAL ENGINE ── */
+const _dataAudio = document.getElementById('sfx-data');
+const _revealedSections = new Set();
+let readyRevealDone = false;
+let nrRevealDone = false;
+
+// Split element's text nodes into .rc char spans, append absolute cursor
+function _wrapChars(el) {
+  function walk(node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const txt = node.textContent;
+      if (!txt) return;
+      const frag = document.createDocumentFragment();
+      for (const ch of txt) {
+        const s = document.createElement('span');
+        s.className = 'rc';
+        s.textContent = ch;
+        frag.appendChild(s);
+      }
+      node.parentNode.replaceChild(frag, node);
+    } else if (node.nodeType === Node.ELEMENT_NODE && node.tagName !== 'BR') {
+      Array.from(node.childNodes).forEach(walk);
+    }
+  }
+  walk(el);
+
+  const cursor = document.createElement('span');
+  cursor.className = 'cmd-cursor';
+  cursor.textContent = '█';
+  el.appendChild(cursor);
+  el._drCursor = cursor;
+}
+
+// Position absolute cursor over a char span
+function _placeCursor(cursor, charSpan, container) {
+  const cr = charSpan.getBoundingClientRect();
+  const pr = container.getBoundingClientRect();
+  cursor.style.left = (cr.left - pr.left) + 'px';
+  cursor.style.top  = (cr.top  - pr.top)  + 'px';
+}
+
+// Reveal a single paragraph's chars over `duration` ms
+function _revealPara(el, duration, onDone) {
+  const chars = Array.from(el.querySelectorAll('.rc'));
+  if (!chars.length) { onDone && onDone(); return; }
+
+  const cursor = el._drCursor;
+  const interval = Math.max(3, duration / chars.length);
+  let i = 0;
+
+  if (cursor && chars[0]) {
+    _placeCursor(cursor, chars[0], el);
+    cursor.style.display = 'block';
+  }
+
+  function step() {
+    chars[i].classList.add('v');
+    i++;
+    if (i < chars.length) {
+      if (cursor) _placeCursor(cursor, chars[i], el);
+      setTimeout(step, interval);
+    } else {
+      if (cursor) cursor.style.display = 'none';
+      onDone && onDone();
+    }
+  }
+  setTimeout(step, interval);
+}
+
+// Play data audio, reveal all body-text paras in parallel, stop audio when all done
+function revealSection(sectionId) {
+  if (_revealedSections.has(sectionId)) return;
+  _revealedSections.add(sectionId);
+
+  const inner = document.getElementById(
+    sectionId === 's1' ? 'i1' : sectionId === 's2' ? 'i2' : 'i3'
+  );
+  if (!inner) return;
+  const paras = Array.from(inner.querySelectorAll('.body-text'));
+  if (!paras.length) return;
+
+  if (_dataAudio) { _dataAudio.currentTime = 0; _dataAudio.play().catch(() => {}); }
+
+  const DURATION = 1200;
+  let done = 0;
+  paras.forEach(p => {
+    _revealPara(p, DURATION, () => {
+      done++;
+      if (done >= paras.length) {
+        if (_dataAudio) { _dataAudio.pause(); _dataAudio.currentTime = 0; }
+      }
+    });
+  });
+}
+
+// Reveal ready/notready copy (once per session)
+function revealCopy(elId) {
+  const el = document.getElementById(elId);
+  if (!el || el._drWrapped) return;
+  el._drWrapped = true;
+
+  if (_dataAudio) { _dataAudio.currentTime = 0; _dataAudio.play().catch(() => {}); }
+  _revealPara(el, 1200, () => {
+    if (_dataAudio) { _dataAudio.pause(); _dataAudio.currentTime = 0; }
+  });
+}
+
+// Init: wrap all body text and copy elements at page load
+(function _initReveal() {
+  ['i1','i2','i3'].forEach(innerId => {
+    const inner = document.getElementById(innerId);
+    if (!inner) return;
+    inner.querySelectorAll('.body-text').forEach(_wrapChars);
+  });
+  // r-cp and nr-cp wrapped when first entered (prevents wrapping hidden/unanimated text)
+  // We wrap them now but don't reveal until triggered
+  const rCp  = document.getElementById('r-cp');
+  const nrCp = document.getElementById('nr-cp');
+  if (rCp)  { _wrapChars(rCp);  rCp._drWrapped  = false; }
+  if (nrCp) { _wrapChars(nrCp); nrCp._drWrapped = false; }
+})();
+
+const scanLine = document.getElementById('scan-line');
+setTimeout(() => { scanLine.classList.add('run'); }, 200);
+scanLine.addEventListener('animationend', () => { scanLine.style.display = 'none'; });
+
+/* ── INJECT SCAN BARS into btn-inner ── */
+document.querySelectorAll('#btn-yes .btn-inner, #btn-no .btn-inner').forEach(el => {
+  const scan = document.createElement('div');
+  scan.className = 'btn-scan';
+  el.appendChild(scan);
+});
+
+/* ── STRIP BUTTON ANIMATIONS AFTER COMPLETE — prevents hover lag ── */
+
+// PRIMARY (btn-yes) — 4 animations on btn-inner
+(function() {
+  const el = document.querySelector('#btn-yes .btn-inner');
+  if (!el) return;
+  let done = 0;
+  const EXPECTED = 4; // btnEntrance + btnBorderGlowRed + btnPrimaryFill + btnScanSweep
+  el.addEventListener('animationend', (e) => {
+    const tracked = ['btnEntrance','btnBorderGlowRed','btnPrimaryFill','btnScanSweep'];
+    if (!tracked.includes(e.animationName)) return;
+    if (e.animationName === 'btnScanSweep') {
+      const scan = el.querySelector('.btn-scan');
+      if (scan) scan.remove();
+    }
+    done++;
+    if (done >= EXPECTED) {
+      el.style.animation = 'none';
+      el.style.willChange = 'auto';
+      el.style.opacity = '1';
+      el.style.filter = 'none';
+      el.style.boxShadow = 'none';
+      el.style.background = 'rgba(155,27,42,0.06)';
+      el.style.color = 'var(--white)';
+      el.style.borderColor = 'var(--red)';
+    }
+  });
+})();
+
+// GHOST (btn-no) — 3 animations on btn-inner, 1 on span
+(function() {
+  const el = document.querySelector('#btn-no .btn-inner');
+  if (!el) return;
+  const span = el.querySelector('span');
+  let innerDone = 0;
+  const INNER_EXPECTED = 3; // btnEntrance + btnBorderGlowWhite + btnScanSweep
+
+  el.addEventListener('animationend', (e) => {
+    const tracked = ['btnEntrance','btnBorderGlowWhite','btnScanSweep'];
+    if (!tracked.includes(e.animationName)) return;
+    if (e.animationName === 'btnScanSweep') {
+      const scan = el.querySelector('.btn-scan');
+      if (scan) scan.remove();
+    }
+    innerDone++;
+    if (innerDone >= INNER_EXPECTED) {
+      el.style.animation = 'none';
+      el.style.willChange = 'auto';
+      el.style.opacity = '1';
+      el.style.filter = 'none';
+      el.style.boxShadow = 'none';
+      el.style.background = 'rgba(155,27,42,0.06)';
+      el.style.borderColor = 'rgba(240,237,232,0.2)';
+    }
+  });
+
+  // Span handles its own reveal — restore after done
+  if (span) {
+    span.addEventListener('animationend', (e) => {
+      if (e.animationName !== 'btnGhostReveal') return;
+      span.style.animation = 'none';
+      span.style.opacity = '1';
+      span.style.transition = 'color 0.25s ease';
+    });
+  }
+})();
+</script>
+</body>
+</html>
